@@ -1,26 +1,168 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Updated to subtle pink theme instead of yellow-brown */
+  --background: #ffffff; /* Clean white background */
+  --foreground: #4b5563; /* Professional gray text */
+  --card: #f8f9fa; /* Light gray for card backgrounds */
+  --card-foreground: #4b5563; /* Text color on cards */
+  --popover: #ffffff; /* Background for popovers */
+  --popover-foreground: #4b5563; /* Text color for popovers */
+  --primary: #ec4899; /* Subtle pink accent */
+  --primary-foreground: #ffffff; /* Text color on primary buttons */
+  --secondary: #f8f9fa; /* Secondary background color */
+  --secondary-foreground: #4b5563; /* Secondary text color */
+  --muted: #e5e7eb; /* Muted background for less prominent elements */
+  --muted-foreground: #6b7280; /* Muted text color */
+  --accent: #ec4899; /* Accent color for highlights */
+  --accent-foreground: #ffffff; /* Text color on accent elements */
+  --destructive: #dc2626; /* Color for destructive actions */
+  --destructive-foreground: #ffffff; /* Text color on destructive buttons */
+  --border: #d1d5db; /* Light border color for separation */
+  --input: #ffffff; /* Input backgrounds */
+  --ring: #ec4899; /* Ring color for focused elements */
+  --chart-1: #ec4899;
+  --chart-2: #4b5563;
+  --chart-3: #f8f9fa;
+  --chart-4: #e5e7eb;
+  --chart-5: #ec4899;
+  --radius: 0.25rem; /* Subtle rounding for cards and buttons */
+  --sidebar: #ffffff;
+  --sidebar-foreground: #4b5563;
+  --sidebar-primary: #f8f9fa;
+  --sidebar-primary-foreground: #4b5563;
+  --sidebar-accent: #ec4899;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #d1d5db;
+  --sidebar-ring: #ec4899;
+  /* Updated font variables to use Caveat for headings and Rubik for body */
+  --font-caveat: "Caveat", cursive;
+  --font-rubik: "Rubik", sans-serif;
+}
+
+.dark {
+  --background: #0a0a0a;
+  --foreground: #fafafa;
+  --card: #171717;
+  --card-foreground: #fafafa;
+  --popover: #171717;
+  --popover-foreground: #fafafa;
+  --primary: #ec4899;
+  --primary-foreground: #ffffff;
+  --secondary: #262626;
+  --secondary-foreground: #fafafa;
+  --muted: #171717;
+  --muted-foreground: #a3a3a3;
+  --accent: #ec4899;
+  --accent-foreground: #fafafa;
+  --destructive: #dc2626;
+  --destructive-foreground: #fafafa;
+  --border: #262626;
+  --input: #171717;
+  --ring: #ec4899;
+  --chart-1: #ec4899;
+  --chart-2: #4b5563;
+  --chart-3: #f8f9fa;
+  --chart-4: #e5e7eb;
+  --chart-5: #ec4899;
+  --sidebar: #171717;
+  --sidebar-foreground: #fafafa;
+  --sidebar-primary: #fafafa;
+  --sidebar-primary-foreground: #0a0a0a;
+  --sidebar-accent: #ec4899;
+  --sidebar-accent-foreground: #fafafa;
+  --sidebar-border: #262626;
+  --sidebar-ring: #ec4899;
+  /* Updated font variables to use Caveat for headings and Rubik for body */
+  --font-caveat: "Caveat", cursive;
+  --font-rubik: "Rubik", sans-serif;
+}
+
+/* Removed bloom effects, added subtle Notion-style hover effects */
+@layer utilities {
+  .notion-hover {
+    transition: all 0.15s ease-out;
+  }
+
+  .notion-hover:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+  }
+
+  .notion-card {
+    transition: all 0.15s ease-out;
+  }
+
+  .notion-card:hover {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+
 }
 
 @theme inline {
+  /* Updated to use bolder Caveat weights for headings */
+  --font-sans: var(--font-rubik);
+  --font-serif: var(--font-caveat);
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
   }
-}
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  /* Added custom font weight classes for thicker Caveat headings */
+  .font-serif {
+    font-weight: 700 !important;
+  }
+
+  h1.font-serif,
+  h2.font-serif,
+  h3.font-serif,
+  h4.font-serif {
+    font-weight: 700 !important;
+  }
 }
