@@ -1,225 +1,88 @@
-'use client';
-import { useMutation, useQuery } from 'convex/react';
-import { BookOpen, Play, Plus, Star } from 'lucide-react';
-import { useState } from 'react';
-import ActivityCalendar from '@/components/ActivityCalendar';
-import RecordCard from '@/components/RecordCard';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { api } from '@/convex/_generated/api';
+import Link from "next/link";
 
-export default function MyDayMyStoryApp() {
-  const [selectedCharacter, setSelectedCharacter] = useState('superhero');
-
-  const stories = useQuery(api.stories.getStories);
-  const storyStats = useQuery(api.stories.getStoryStats);
-  const incrementPlays = useMutation(api.stories.incrementPlays);
-
-  const characters = [
-    { id: 'superhero', name: 'Super Hero', emoji: '🦸‍♀️' },
-    { id: 'pirate', name: 'Pirate Captain', emoji: '🏴‍☠️' },
-    { id: 'astronaut', name: 'Space Explorer', emoji: '🚀' },
-    { id: 'princess', name: 'Royal Princess', emoji: '👸' },
-    { id: 'dinosaur', name: 'Dino Friend', emoji: '🦕' },
-    { id: 'wizard', name: 'Magic Wizard', emoji: '🧙‍♂️' },
-  ];
-
-  // Handle play button click
-  const handlePlayStory = async (storyId: any) => {
-    try {
-      await incrementPlays({ storyId });
-    } catch (error) {
-      console.error('Failed to increment plays:', error);
-    }
-  };
-
-  // Format duration from seconds to minutes
-  const formatDuration = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    if (mins === 0) return `${secs}s`;
-    if (secs === 0) return `${mins}m`;
-    return `${mins}m ${secs}s`;
-  };
-
-  // Format relative date
-  const formatRelativeDate = (timestamp: number) => {
-    const now = Date.now();
-    const diff = now - timestamp;
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-
-    if (days === 0) return 'Today';
-    if (days === 1) return 'Yesterday';
-    if (days < 7) return `${days} days ago`;
-    if (days < 30) return `${Math.floor(days / 7)} weeks ago`;
-    return new Date(timestamp).toLocaleDateString();
-  };
-
+export default function Home() {
   return (
-    <div className="min-h-screen bg-background">
-      <header className="bg-background border-b border-border">
-        <div className="max-w-5xl mx-auto px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-muted rounded flex items-center justify-center">
-                <BookOpen className="h-4 w-4 text-muted-foreground" />
-              </div>
-              <div>
-                <h1 className="text-xl font-semibold text-foreground font-serif">
-                  My Day, My Story
-                </h1>
-                <p className="text-sm text-muted-foreground">
-                  Turn your day into magical adventures
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="text-sm text-muted-foreground">
-                {storyStats
-                  ? `${storyStats.totalStories} stories`
-                  : 'Loading...'}
-              </span>
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-8 bg-transparent"
+    <div data-app="parent" className="relative min-h-screen">
+      {/* Delightful, subtle background using brand pink accents */}
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        <div
+          className="absolute -top-24 -left-24 size-[280px] rounded-full bg-pink-300/30 blur-3xl"
+          style={{ animation: "float 10s ease-in-out infinite" }}
+        />
+        <div
+          className="absolute -bottom-28 -right-24 size-[320px] rounded-full bg-accent/40 blur-3xl"
+          style={{ animation: "float 9s ease-in-out infinite reverse" }}
+        />
+      </div>
+
+      <main className="mx-auto max-w-6xl px-6 py-16 md:py-20">
+        {/* Hero */}
+        <section className="grid items-center gap-10 md:grid-cols-2">
+          <div>
+            <h1 className="font-serif text-4xl font-extrabold tracking-tight md:text-5xl">
+              Turn your day into a magical bedtime story
+            </h1>
+            <p className="mt-3 text-base text-muted-foreground md:text-lg">
+              Record a moment, pick a character, and we’ll craft a playful, kid‑friendly story—ready by bedtime.
+            </p>
+
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <Link
+                href="/parent"
+                className="inline-flex items-center justify-center rounded-lg border border-border bg-card px-5 py-3 text-sm font-medium notion-hover"
               >
-                Family
-              </Button>
+                I’m a Parent
+              </Link>
+              <Link
+                href="/kids"
+                className="inline-flex items-center justify-center rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:brightness-110"
+              >
+                Kids Mode
+              </Link>
+            </div>
+
+            <div className="mt-6 flex items-center gap-4 text-xs text-muted-foreground">
+              <div className="flex items-center gap-2 rounded-full bg-white/70 px-3 py-1 shadow-sm">
+                <span className="inline-block size-2 rounded-full bg-green-500"></span>
+                <span>Real‑time, private by default</span>
+              </div>
+              <div className="hidden md:block">No setup required</div>
             </div>
           </div>
-        </div>
-      </header>
 
-      <main className="max-w-5xl mx-auto px-8 py-8">
-        <div className="space-y-12">
-          <ActivityCalendar
-            showInfographic={true}
-            showLegend={true}
-            showStats={true}
-          />
-
-          <section className="space-y-6">
-            <div className="flex items-center gap-3 mb-6">
-              <h2 className="text-lg font-medium text-foreground font-serif">
-                Let's Talk about your day
-              </h2>
-            </div>
-            <RecordCard />
-          </section>
-
-          <section className="space-y-4">
-            <h2 className="text-lg font-medium text-foreground font-serif">
-              Choose Your Character
-            </h2>
-
-            <div className="grid grid-cols-6 gap-3">
-              {characters.map((character) => (
-                <Button
-                  key={character.id}
-                  className={`p-3 rounded-lg border transition-all notion-hover ${
-                    selectedCharacter === character.id
-                      ? 'border-primary bg-primary/5'
-                      : 'border-border bg-card hover:bg-muted/50'
-                  }`}
-                  onClick={() => setSelectedCharacter(character.id)}
-                >
-                  <div className="text-2xl mb-2">{character.emoji}</div>
-                  <div className="text-xs font-medium text-foreground">
-                    {character.name}
-                  </div>
-                </Button>
-              ))}
-            </div>
-          </section>
-
-          {/* Stories Database */}
-          <section className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-medium text-foreground font-serif">
-                Your Stories
-              </h2>
-              <Button variant="ghost" size="sm" className="h-8">
-                <Plus className="h-4 w-4 mr-2" />
-                New Story
-              </Button>
-            </div>
-
-            <div className="border border-border rounded-lg overflow-hidden">
-              <div className="bg-muted/30 border-b border-border px-4 py-3">
-                <div className="grid grid-cols-12 gap-4 text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                  <div className="col-span-5">Story</div>
-                  <div className="col-span-2">Character</div>
-                  <div className="col-span-1">Duration</div>
-                  <div className="col-span-1">Plays</div>
-                  <div className="col-span-1">Rating</div>
-                  <div className="col-span-1">Date</div>
-                  <div className="col-span-1"></div>
+          {/* Preview card */}
+          <div className="relative">
+            <div className="rounded-2xl border border-border bg-white/70 p-5 shadow-md backdrop-blur-sm">
+              <div className="mb-2 text-xs font-medium text-muted-foreground">Tonight’s Story</div>
+              <div className="rounded-xl bg-gradient-to-br from-pink-100 via-white to-accent/30 p-5">
+                <h3 className="font-serif text-2xl font-semibold">The Supermarket Superhero</h3>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  When the apples tried to roll away, our tiny hero leapt into action!
+                </p>
+                <div className="mt-4 flex gap-2">
+                  <span className="rounded-full bg-pink-100 px-3 py-1 text-xs text-pink-700">Superhero</span>
+                  <span className="rounded-full bg-blue-100 px-3 py-1 text-xs text-blue-700">2 min</span>
                 </div>
               </div>
-
-              <div className="divide-y divide-border">
-                {stories && stories.length > 0 ? (
-                  stories.map((story, index) => (
-                    <div
-                      key={story._id || index}
-                      className="px-4 py-3 notion-hover cursor-pointer"
-                    >
-                      <div className="grid grid-cols-12 gap-4 items-center">
-                        <div className="col-span-5 flex items-center gap-3">
-                          <span className="text-lg">{story.emoji}</span>
-                          <span className="font-medium text-foreground font-serif">
-                            {story.title}
-                          </span>
-                        </div>
-                        <div className="col-span-2">
-                          <Badge variant="secondary" className="text-xs">
-                            {story.characterName}
-                          </Badge>
-                        </div>
-                        <div className="col-span-1 text-sm text-muted-foreground">
-                          {formatDuration(story.duration)}
-                        </div>
-                        <div className="col-span-1 text-sm text-muted-foreground">
-                          {story.plays}
-                        </div>
-                        <div className="col-span-1">
-                          <div className="flex items-center">
-                            {[...Array(story.rating)].map((_, i) => (
-                              <Star
-                                key={i}
-                                className="h-3 w-3 text-yellow-500 fill-current"
-                              />
-                            ))}
-                          </div>
-                        </div>
-                        <div className="col-span-1 text-sm text-muted-foreground">
-                          {formatRelativeDate(story.createdAt)}
-                        </div>
-                        <div className="col-span-1 flex justify-end">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 w-8 p-0"
-                            onClick={() => handlePlayStory(story._id)}
-                          >
-                            <Play className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="px-4 py-8 text-center text-muted-foreground">
-                    {stories === undefined
-                      ? 'Loading stories...'
-                      : 'No stories yet. Record your first adventure!'}
-                  </div>
-                )}
-              </div>
             </div>
-          </section>
-        </div>
+          </div>
+        </section>
+
+        {/* How it works */}
+        <section className="mt-16 grid gap-4 sm:grid-cols-3">
+          <div className="rounded-xl border border-border bg-card p-4 notion-card">
+            <div className="text-sm font-semibold">1. Record your day</div>
+            <div className="mt-1 text-sm text-muted-foreground">Just a moment or two—it’s enough.</div>
+          </div>
+          <div className="rounded-xl border border-border bg-card p-4 notion-card">
+            <div className="text-sm font-semibold">2. Pick a character</div>
+            <div className="mt-1 text-sm text-muted-foreground">Astronaut, pirate, superhero, and more.</div>
+          </div>
+          <div className="rounded-xl border border-border bg-card p-4 notion-card">
+            <div className="text-sm font-semibold">3. Read at bedtime</div>
+            <div className="mt-1 text-sm text-muted-foreground">A delightful story, every time.</div>
+          </div>
+        </section>
       </main>
     </div>
   );

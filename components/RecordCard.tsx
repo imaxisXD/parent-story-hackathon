@@ -1,5 +1,8 @@
+'use client';
 import { useConversation } from '@elevenlabs/react';
-import { AudioWaveform, Loader2, Mic, MicOff, Waves } from 'lucide-react';
+import { MeshGradient, PulsingBorder } from '@paper-design/shaders-react';
+import { Loader, MicOff } from 'lucide-react';
+import Image from 'next/image';
 import { useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from './ui/button';
@@ -8,12 +11,18 @@ export default function RecordCard() {
   const { isSpeaking, startSession, status, endSession } = useConversation();
   const cardState = useMemo(() => {
     if (isSpeaking) return 'ai-speaking';
-    return status; // 'disconnected', 'connecting', 'connected', or 'disconnecting'
+    return status;
   }, [status, isSpeaking]);
-
+  console.log('cardState', cardState);
   const handleStartRecording = async () => {
     try {
-      if (status === 'connected') return;
+      if (
+        status === 'connected' ||
+        cardState === 'ai-speaking' ||
+        cardState === 'connecting' ||
+        cardState === 'disconnecting'
+      )
+        return;
       await navigator.mediaDevices.getUserMedia({ audio: true });
       await startSession({
         agentId: 'agent_4601k3h4kmvkfykv50nv1knm25xy',
@@ -39,91 +48,119 @@ export default function RecordCard() {
   };
 
   return (
-    <div className="relative">
+    <div className="relative rounded-3xl overflow-hidden p-[3px]">
+      <div className="pointer-events-none absolute inset-0 z-0">
+        <PulsingBorder
+          style={{ height: '100%', width: '100%' }}
+          colorBack="#ffffff00"
+          roundness={0.18}
+          thickness={0.028}
+          softness={1}
+          intensity={1}
+          bloom={0.8}
+          spots={3}
+          spotSize={0.2}
+          pulse={
+            cardState === 'connected' || cardState === 'ai-speaking' ? 0.8 : 0.4
+          }
+          smoke={0.4}
+          smokeSize={0.3}
+          scale={1}
+          rotation={0}
+          offsetX={0}
+          offsetY={0}
+          speed={
+            cardState === 'connected' || cardState === 'ai-speaking' ? 1.8 : 0.7
+          }
+          colors={['#8ec5ff', '#b6f3ea', '#cab8ff', '#ffd6e8']}
+        />
+      </div>
       <div
         className={cn(
-          'p-8 border rounded-xl transition-all duration-500',
+          'relative z-10 rounded-[inherit] transition-all duration-500 p-4 pt-6 drop-shadow backdrop-blur-sm',
           cardState === 'disconnected' &&
-            'border-border bg-card hover:bg-muted/30',
-          cardState === 'connecting' &&
-            'border-amber-400/30 bg-amber-50/5 shadow-md shadow-amber-400/10',
-          cardState === 'connected' &&
-            'border-green-400/30 bg-green-50/5 shadow-md shadow-green-400/10',
-          cardState === 'disconnecting' &&
-            'border-orange-400/30 bg-orange-50/5 shadow-md shadow-orange-400/10',
-          cardState === 'ai-speaking' &&
-            'border-primary/30 bg-primary/5 shadow-lg shadow-primary/10'
+            'bg-gradient-to-br from-white to-white/90',
+          cardState === 'connecting' && 'bg-amber-50/10',
+          cardState === 'connected' && 'bg-green-50/10',
+          cardState === 'disconnecting' && 'bg-orange-50/10',
+          cardState === 'ai-speaking' && 'bg-white/10'
         )}
       >
         <div className="flex flex-col items-center space-y-6">
           <div className="relative">
-            <Button
-              className={cn(
-                'relative w-24 h-24 rounded-full border-2 transition-all duration-300 flex items-center justify-center',
-                // Base state styling based on cardState
-                cardState === 'disconnected' &&
-                  'border-pink-400 bg-gradient-to-br from-pink-400 to-primary hover:from-pink-600 hover:to-pink-700 shadow-lg shadow-primary/25',
-                cardState === 'connecting' &&
-                  'border-amber-400 bg-gradient-to-br from-amber-300 to-amber-500 hover:from-amber-400 hover:to-amber-600 shadow-lg shadow-amber-400/25 animate-pulse',
-                cardState === 'connected' &&
-                  'border-green-400 bg-gradient-to-br from-green-400 to-primary hover:from-green-500 hover:to-primary shadow-lg shadow-green-400/25',
-                cardState === 'disconnecting' &&
-                  'border-orange-400 bg-gradient-to-br from-orange-400 to-red-400 hover:from-orange-500 hover:to-red-500 shadow-lg shadow-orange-400/25 opacity-90',
-                cardState === 'ai-speaking' &&
-                  'border-primary bg-gradient-to-br from-violet-400 to-primary hover:from-violet-500 hover:to-primary shadow-lg shadow-primary/25'
-              )}
+            <button
               onClick={handleStartRecording}
               disabled={
                 cardState === 'connecting' ||
                 cardState === 'disconnecting' ||
                 status === 'connected'
               }
+              className={cn(
+                'relative hover:scale-105 transition-all duration-300 w-[110px] h-[110px] border border-dashed border-sky-300 rounded-full overflow-hidden focus:outline-none disabled:opacity-60 disabled:cursor-not-allowed',
+                cardState === 'connecting' && 'animate-pulse'
+              )}
+              type="button"
+              aria-label="Start recording"
             >
-              {/* Icon based on state */}
-              {cardState === 'connecting' && (
-                <Loader2 className="h-8 w-8 text-white animate-spin" />
-              )}
-              {cardState === 'disconnecting' && (
-                <Loader2 className="h-8 w-8 text-white animate-spin" />
-              )}
-              {cardState === 'connected' && (
-                <Mic className="h-8 w-8 text-white" />
-              )}
-              {cardState === 'disconnected' && (
-                <Mic className="h-8 w-8 text-white" />
-              )}
-              {cardState === 'ai-speaking' && (
-                <Waves className="h-8 w-8 text-white animate-pulse" />
-              )}
-
-              {/* Pulsing ring animations based on state */}
+              <MeshGradient
+                style={{ height: '100%', width: '100%' }}
+                distortion={0.8}
+                swirl={0.5}
+                offsetX={0}
+                offsetY={0}
+                scale={1}
+                rotation={0}
+                speed={2}
+                colors={['#06b6d4', '#3b82f6', '#9333ea']}
+                className="rounded-full opacity-20"
+              />
+              <div className="absolute inset-0 flex items-center justify-center">
+                {cardState === 'connecting' && (
+                  <Loader className="h-10 w-10 text-white animate-spin" />
+                )}
+                {cardState === 'disconnecting' && (
+                  <Loader className="h-10 w-10 text-white animate-spin" />
+                )}
+                {(cardState === 'connected' ||
+                  cardState === 'disconnected') && (
+                  <Image
+                    src="/kira.webp"
+                    alt="Kira"
+                    width={140}
+                    height={140}
+                    className="object-cover drop-shadow-md"
+                    priority
+                  />
+                )}
+                {cardState === 'ai-speaking' && (
+                  <Image
+                    src="/kira-speaking.gif"
+                    alt="Kira"
+                    width={140}
+                    height={140}
+                    className="object-cover drop-shadow-md"
+                    unoptimized
+                  />
+                )}
+              </div>
               {cardState === 'connected' && (
                 <>
-                  <div className="absolute inset-0 rounded-full border-2 border-blue-500 animate-ping opacity-75"></div>
-                  <div className="absolute inset-0 rounded-full border-2 border-blue-500 animate-pulse"></div>
-                </>
-              )}
-              {cardState === 'ai-speaking' && (
-                <>
-                  <div className="absolute inset-0 rounded-full border-2 border-primary animate-ping opacity-50"></div>
-                  <div className="absolute inset-0 rounded-full border-2 border-primary animate-pulse"></div>
+                  <div className="pointer-events-none absolute inset-0 rounded-full border-2 border-blue-500 animate-ping opacity-75"></div>
+                  <div className="pointer-events-none absolute inset-0 rounded-full border-2 border-blue-500 animate-pulse"></div>
                 </>
               )}
               {cardState === 'disconnecting' && (
-                <div className="absolute inset-0 rounded-full border-2 border-orange-400 animate-pulse opacity-75"></div>
+                <div className="pointer-events-none absolute inset-0 rounded-full border-2 border-orange-400 animate-pulse opacity-75"></div>
               )}
               {cardState === 'connecting' && (
-                <div className="absolute inset-0 rounded-full border-2 border-amber-400 animate-ping opacity-50"></div>
+                <div className="pointer-events-none absolute inset-0 rounded-full border-2 border-amber-400 animate-ping opacity-50"></div>
               )}
-            </Button>
-
-            {/* Connection status indicator dot */}
+            </button>
             {cardState === 'connected' && (
               <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full border border-white animate-pulse"></div>
             )}
           </div>
 
-          {/* Connection and Recording Status */}
           <div className="text-center space-y-2 min-h-12">
             {cardState === 'disconnected' && (
               <>
@@ -180,7 +217,7 @@ export default function RecordCard() {
                 <div className="flex items-center justify-center gap-2">
                   <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
                   <span className="text-sm font-medium text-foreground">
-                    AI is Speaking...
+                    Kira is Speaking...
                   </span>
                 </div>
                 <p className="text-xs text-muted-foreground">
@@ -189,53 +226,42 @@ export default function RecordCard() {
               </>
             )}
           </div>
-
-          {/* Audio Waveform Visualization */}
           {(cardState === 'connected' || cardState === 'ai-speaking') && (
             <div className="flex items-center justify-center gap-1 h-12">
-              {[...Array(12)].map((_, i) => (
+              {Array.from({ length: 12 }, (_, i) => ({
+                id: `waveform-${i}`,
+                height: Math.random() * 40 + 10,
+                delay: i * 0.1,
+                duration: 0.5 + Math.random() * 0.5,
+              })).map((bar) => (
                 <div
-                  key={i}
+                  key={bar.id}
                   className={cn(
                     'w-1 rounded-full animate-pulse',
                     cardState === 'connected' && 'bg-blue-500',
                     cardState === 'ai-speaking' && 'bg-primary'
                   )}
                   style={{
-                    height: `${Math.random() * 40 + 10}px`,
-                    animationDelay: `${i * 0.1}s`,
-                    animationDuration: `${0.5 + Math.random() * 0.5}s`,
+                    height: `${bar.height}px`,
+                    animationDelay: `${bar.delay}s`,
+                    animationDuration: `${bar.duration}s`,
                   }}
                 ></div>
               ))}
             </div>
           )}
           <div className="flex items-center gap-3">
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-8 text-xs bg-transparent"
-              disabled={
-                cardState === 'ai-speaking' ||
-                cardState === 'connecting' ||
-                cardState === 'disconnecting'
-              }
-              onClick={handleStopRecording}
-            >
-              <MicOff className="h-3 w-3 mr-1" />
-              Stop
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-8 text-xs bg-transparent"
-              disabled={
-                cardState !== 'connected' && cardState !== 'ai-speaking'
-              }
-            >
-              <AudioWaveform className="h-3 w-3 mr-1" />
-              Preview
-            </Button>
+            {(cardState === 'connected' || cardState === 'ai-speaking') && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 text-xs bg-transparent border border-red-300 text-red-500"
+                onClick={handleStopRecording}
+              >
+                <MicOff className="h-3 w-3 mr-1" />
+                Stop
+              </Button>
+            )}
           </div>
         </div>
       </div>

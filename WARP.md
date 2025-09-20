@@ -67,7 +67,7 @@ Pre-built accessible components with custom theming. Configuration in `component
 ### Custom Theming
 The app uses a custom pink-themed color scheme:
 - Primary color: `#ec4899` (pink)
-- Custom fonts: Caveat (serif/headings) and Rubik (sans/body)
+- Custom fonts: Grandstander (serif/headings) and Rubik (sans/body)
 - Light/dark mode support with CSS variables
 - Custom CSS classes for Notion-style interactions
 

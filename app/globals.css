@@ -1,16 +1,16 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-
 :root {
-  --background: oklch(0.9842 0.0034 247.8575);
+  --background: #f9fafb;
   --foreground: oklch(0.2795 0.0368 260.0310);
   --card: oklch(1.0000 0 0);
   --card-foreground: oklch(0.2795 0.0368 260.0310);
   --popover: oklch(1.0000 0 0);
   --popover-foreground: oklch(0.2795 0.0368 260.0310);
-  --primary: oklch(0.6559 0.2118 354.3084);
-  --primary-foreground: oklch(1.0000 0 0);
+  /* Brand pink per project rules */
+  --primary: #ec4899;
+  --primary-foreground: #ffffff;
   --secondary: oklch(0.9276 0.0058 264.5313);
   --secondary-foreground: oklch(0.3729 0.0306 259.7328);
   --muted: oklch(0.9670 0.0029 264.5419);
@@ -18,7 +18,7 @@
   --accent: oklch(0.9299 0.0334 272.7879);
   --accent-foreground: oklch(0.3729 0.0306 259.7328);
   --destructive: oklch(0.6368 0.2078 25.3313);
-  --destructive-foreground: oklch(1.0000 0 0);
+  --destructive-foreground: #ffffff;
   --border: oklch(0.8717 0.0093 258.3382);
   --input: oklch(0.8717 0.0093 258.3382);
   --ring: oklch(0.5854 0.2041 277.1173);
@@ -30,12 +30,13 @@
   --sidebar: oklch(0.9670 0.0029 264.5419);
   --sidebar-foreground: oklch(0.2795 0.0368 260.0310);
   --sidebar-primary: oklch(0.5854 0.2041 277.1173);
-  --sidebar-primary-foreground: oklch(1.0000 0 0);
+  --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: oklch(0.9299 0.0334 272.7879);
   --sidebar-accent-foreground: oklch(0.3729 0.0306 259.7328);
   --sidebar-border: oklch(0.8717 0.0093 258.3382);
   --sidebar-ring: oklch(0.5854 0.2041 277.1173);
-  --radius: 0.5rem;
+  /* Rounder default for playful vibe */
+  --radius: 0.75rem;
   --shadow-2xs: 0px 4px 8px -1px hsl(0 0% 0% / 0.05);
   --shadow-xs: 0px 4px 8px -1px hsl(0 0% 0% / 0.05);
   --shadow-sm: 0px 4px 8px -1px hsl(0 0% 0% / 0.10), 0px 1px 2px -2px hsl(0 0% 0% / 0.10);
@@ -46,33 +47,34 @@
   --shadow-2xl: 0px 4px 8px -1px hsl(0 0% 0% / 0.25);
   --tracking-normal: 0em;
   --spacing: 0.25rem;
+
+  /* Fun accent palette for chips/accents */
+  --fun-yellow: #fde047;
+  --fun-green: #34d399;
+  --fun-blue: #60a5fa;
+  --fun-purple: #a78bfa;
 }
 
-/* Removed bloom effects, added subtle Notion-style hover effects */
+/* Utilities and playful animations */
 @layer utilities {
-  .notion-hover {
-    transition: all 0.15s ease-out;
+  .notion-hover { transition: all 0.15s ease-out; }
+  .notion-hover:hover { background-color: rgba(0, 0, 0, 0.02); }
+  .notion-card { transition: all 0.15s ease-out; }
+  .notion-card:hover { box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); }
+
+  .hover-lift { transition: transform .2s ease, box-shadow .2s ease; }
+  .hover-lift:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+
+  .fun-dotted-bg {
+    background-image: radial-gradient(circle at 1px 1px, rgba(0,0,0,0.05) 1px, transparent 0);
+    background-size: 16px 16px;
   }
-
-  .notion-hover:hover {
-    background-color: rgba(0, 0, 0, 0.02);
-  }
-
-  .notion-card {
-    transition: all 0.15s ease-out;
-  }
-
-  .notion-card:hover {
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  }
-
-
 }
 
 @theme inline {
-  /* Updated to use bolder Caveat weights for headings */
-  --font-sans: var(--font-inter);
-  --font-serif: var(--font-inter);
+  /* Fonts are provided via next/font and exposed to CSS variables in layout */
+  --font-sans: var(--font-rubik);
+  --font-serif: var(--font-grandstander);
   --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
   --color-background: var(--background);
@@ -124,10 +126,67 @@
 }
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground font-sans;
-  }
+  * { @apply border-border outline-ring/50; }
+  body { @apply bg-background text-foreground font-sans overflow-x-hidden; }
+}
+
+/* Theming: override tokens per app mode using data-app wrapper */
+/* Parent mode — calm, mature */
+[data-app="parent"] {
+  --background: oklch(1 0 0); /* white */
+  --foreground: oklch(0.28 0.037 260.03);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.28 0.037 260.03);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.28 0.037 260.03);
+  --primary: #ec4899; /* brand pink, used sparingly in parent mode */
+  --primary-foreground: #ffffff;
+  --secondary: oklch(0.96 0.01 264.5);
+  --secondary-foreground: oklch(0.37 0.03 259.73);
+  --muted: oklch(0.97 0.003 264.54);
+  --muted-foreground: oklch(0.55 0.023 264.36);
+  --accent: oklch(0.96 0.01 264.5);
+  --accent-foreground: oklch(0.37 0.03 259.73);
+  --destructive: oklch(0.64 0.208 25.33);
+  --destructive-foreground: #ffffff;
+  --border: oklch(0.90 0.006 258.34);
+  --input: oklch(0.90 0.006 258.34);
+  --ring: oklch(0.77 0.04 260);
+
+  /* Calmer, mature typography and shapes */
+  --font-sans: var(--font-inter);
+  --radius: 0.5rem;
+}
+
+/* Kids mode — playful, saturated */
+[data-app="kids"] {
+  --background: oklch(0.99 0.02 330); /* very soft pink */
+  --foreground: oklch(0.33 0.05 330);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.33 0.05 330);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.33 0.05 330);
+  --primary: #ec4899; /* brand pink */
+  --primary-foreground: #ffffff;
+  --secondary: oklch(0.94 0.03 280);
+  --secondary-foreground: oklch(0.35 0.04 280);
+  --muted: oklch(0.97 0.01 330);
+  --muted-foreground: oklch(0.45 0.03 330);
+  --accent: oklch(0.92 0.06 290);
+  --accent-foreground: oklch(0.30 0.05 290);
+  --destructive: oklch(0.64 0.208 25.33);
+  --destructive-foreground: #ffffff;
+  --border: oklch(0.88 0.012 258.34);
+  --input: oklch(0.88 0.012 258.34);
+  --ring: oklch(0.70 0.12 330);
+}
+
+/* Keyframes for playful motion */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes bounce-soft {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
 }

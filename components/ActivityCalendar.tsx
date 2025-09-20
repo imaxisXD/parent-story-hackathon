@@ -17,6 +17,7 @@ interface ActivityCalendarProps {
   showLegend?: boolean;
   showStats?: boolean;
   showInfographic?: boolean;
+  onDaySelect?: (date: string) => void;
 }
 
 // Utility functions moved outside component to prevent recreation on each render
@@ -64,6 +65,7 @@ const ActivityCalendar = memo(function ActivityCalendar({
   showTitle = true,
   showLegend = true,
   showStats = true,
+  onDaySelect,
 }: ActivityCalendarProps) {
   const activityData = useQuery(api.stories.getActivityData);
   const storyStats = useQuery(api.stories.getStoryStats);
@@ -155,7 +157,7 @@ const ActivityCalendar = memo(function ActivityCalendar({
           </div>
 
           {/* Calendar with month headers and weekday labels */}
-          <div className="flex flex-col gap-1 overflow-x-auto min-w-fit">
+          <div className="flex flex-col gap-1 overflow-x-hidden md:overflow-visible">
             {activityData && (
               <>
                 {/* Month labels row */}
@@ -194,7 +196,11 @@ const ActivityCalendar = memo(function ActivityCalendar({
                     {optimizedActivityData.map((day) => (
                       <Tooltip key={day.date} disableHoverableContent={true}>
                         <TooltipTrigger asChild>
-                          <div className={day.className} style={day.style} />
+                          <div
+                            className={day.className}
+                            style={day.style}
+                            // onClick={() => onDaySelect?.(day.date)}
+                          />
                         </TooltipTrigger>
                         <TooltipContent>
                           <p>{day.tooltipText}</p>
