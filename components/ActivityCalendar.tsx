@@ -16,8 +16,6 @@ interface ActivityCalendarProps {
   showTitle?: boolean;
   showLegend?: boolean;
   showStats?: boolean;
-  showInfographic?: boolean;
-  onDaySelect?: (date: string) => void;
 }
 
 // Utility functions moved outside component to prevent recreation on each render
@@ -61,11 +59,10 @@ const WEEKDAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 const ActivityCalendar = memo(function ActivityCalendar({
   className = '',
-  title = 'Your Daily Journal Log',
+  title = 'Your Daily Story Log',
   showTitle = true,
   showLegend = true,
   showStats = true,
-  onDaySelect,
 }: ActivityCalendarProps) {
   const activityData = useQuery(api.stories.getActivityData);
   const storyStats = useQuery(api.stories.getStoryStats);
@@ -90,15 +87,6 @@ const ActivityCalendar = memo(function ActivityCalendar({
       }
     }
 
-    if (!addedColumns.has(1) && activityData[0]) {
-      const firstDate = parseLocalDate(activityData[0].date);
-      const firstMonthName = firstDate.toLocaleDateString('en-US', {
-        month: 'short',
-      });
-      labels.unshift({ col: 1, text: firstMonthName });
-      addedColumns.add(1);
-    }
-
     return labels;
   }, [activityData]);
 
@@ -109,7 +97,7 @@ const ActivityCalendar = memo(function ActivityCalendar({
       const isToday = day.date === todayString;
       const tooltipText = formatTooltipText(day.date, day.stories, isToday);
 
-      const className = `w-3 h-3 rounded-sm cursor-pointer relative hover:outline-1 hover:outline-pink-500/60 ${getLevelColor(day.level)} ${
+      const className = `w-2 h-2 sm:w-3 sm:h-3 rounded-sm cursor-pointer relative hover:outline-1 hover:outline-pink-500/60 ${getLevelColor(day.level)} ${
         isToday ? 'outline-2 outline-blue-500 ' : ''
       }`;
 
@@ -131,7 +119,8 @@ const ActivityCalendar = memo(function ActivityCalendar({
   const loadingDays = useMemo(
     () =>
       Array.from({ length: 365 }, (_, index) => ({
-        className: 'w-3 h-3 rounded-sm bg-gray-200 cursor-pointer',
+        className:
+          'w-2 h-2 sm:w-3 sm:h-3 rounded-sm bg-gray-200 cursor-pointer',
         style: {
           gridColumn: Math.floor(index / 7) + 1,
           gridRow: (index % 7) + 1,
@@ -144,12 +133,10 @@ const ActivityCalendar = memo(function ActivityCalendar({
     <TooltipProvider delayDuration={300}>
       <div className={`space-y-3 ${className}`}>
         {showTitle && (
-          <h2 className="text-lg font-medium text-foreground font-serif">
-            {title}
-          </h2>
+          <h2 className="text-lg font-medium text-foreground">{title}</h2>
         )}
 
-        <div className="p-4 border border-border rounded-lg bg-card w-fit mx-auto">
+        <div className="p-2 sm:p-4 border border-border rounded-lg bg-card w-full max-w-full overflow-x-auto">
           <div className="mb-2">
             <p className="text-sm text-muted-foreground">
               Stories created in the past year
@@ -157,18 +144,18 @@ const ActivityCalendar = memo(function ActivityCalendar({
           </div>
 
           {/* Calendar with month headers and weekday labels */}
-          <div className="flex flex-col gap-1 overflow-x-hidden md:overflow-visible">
+          <div className="flex flex-col gap-1 min-w-fit">
             {activityData && (
               <>
                 {/* Month labels row */}
                 <div className="flex items-center">
-                  <div className="w-[30px]"></div>{' '}
+                  <div className="w-[24px] sm:w-[30px]"></div>{' '}
                   {/* Empty space for weekday labels */}
-                  <div className="grid grid-cols-[repeat(53,12px)] gap-0.5 h-4">
+                  <div className="grid grid-cols-[repeat(53,8px)] sm:grid-cols-[repeat(53,12px)] gap-0.5 h-3 sm:h-4 min-w-fit">
                     {monthLabels.map((label) => (
                       <div
                         key={`${label.text}-${label.col}`}
-                        className="text-[10px] text-muted-foreground font-medium leading-none justify-self-center"
+                        className="text-[8px] sm:text-[10px] text-muted-foreground font-medium leading-none justify-self-center"
                         style={{ gridColumn: label.col }}
                       >
                         {label.text}
@@ -180,11 +167,11 @@ const ActivityCalendar = memo(function ActivityCalendar({
                 {/* Combined calendar with weekday labels */}
                 <div className="flex gap-1.5 items-start justify-start">
                   {/* Weekday labels column */}
-                  <div className="flex flex-col gap-0.5 w-[30px]">
+                  <div className="flex flex-col gap-0.5 w-[24px] sm:w-[30px]">
                     {WEEKDAY_LABELS.map((day) => (
                       <div
                         key={day}
-                        className="text-[9px] text-muted-foreground text-right leading-3 font-medium h-3 flex items-center justify-end pr-1"
+                        className="text-[7px] sm:text-[9px] text-muted-foreground text-right leading-3 font-medium h-3 flex items-center justify-end pr-1"
                       >
                         {day}
                       </div>
@@ -192,15 +179,11 @@ const ActivityCalendar = memo(function ActivityCalendar({
                   </div>
 
                   {/* Main calendar grid */}
-                  <div className="grid grid-cols-[repeat(53,12px)] grid-rows-[repeat(7,12px)] gap-0.5 grid-flow-col justify-start p-0.5">
+                  <div className="grid grid-cols-[repeat(53,8px)] sm:grid-cols-[repeat(53,12px)] grid-rows-[repeat(7,8px)] sm:grid-rows-[repeat(7,12px)] gap-0.5 grid-flow-col justify-start p-0.5 min-w-fit">
                     {optimizedActivityData.map((day) => (
                       <Tooltip key={day.date} disableHoverableContent={true}>
                         <TooltipTrigger asChild>
-                          <div
-                            className={day.className}
-                            style={day.style}
-                            // onClick={() => onDaySelect?.(day.date)}
-                          />
+                          <div className={day.className} style={day.style} />
                         </TooltipTrigger>
                         <TooltipContent>
                           <p>{day.tooltipText}</p>
@@ -213,7 +196,7 @@ const ActivityCalendar = memo(function ActivityCalendar({
             )}
 
             {!activityData && (
-              <div className="grid grid-cols-[repeat(53,12px)] grid-rows-[repeat(7,12px)] gap-0.5 grid-flow-col justify-start p-0.5">
+              <div className="grid grid-cols-[repeat(53,8px)] sm:grid-cols-[repeat(53,12px)] grid-rows-[repeat(7,8px)] sm:grid-rows-[repeat(7,12px)] gap-0.5 grid-flow-col justify-start p-0.5 min-w-fit">
                 {loadingDays.map((day) => (
                   <Tooltip
                     key={`c${(day.style as { gridColumn: number; gridRow: number }).gridColumn}-r${(day.style as { gridColumn: number; gridRow: number }).gridRow}`}
@@ -232,7 +215,7 @@ const ActivityCalendar = memo(function ActivityCalendar({
           </div>
 
           {(showStats || showLegend) && (
-            <div className="mt-2 flex items-center justify-between">
+            <div className="mt-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
               {showStats && (
                 <div className="text-xs text-muted-foreground">
                   <span className="font-medium">
@@ -245,11 +228,11 @@ const ActivityCalendar = memo(function ActivityCalendar({
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <span>Less</span>
                   <div className="flex gap-1">
-                    <div className="w-3 h-3 rounded-sm bg-gray-200 "></div>
-                    <div className="w-3 h-3 rounded-sm bg-pink-100 "></div>
-                    <div className="w-3 h-3 rounded-sm bg-pink-300"></div>
-                    <div className="w-3 h-3 rounded-sm bg-pink-400/80"></div>
-                    <div className="w-3 h-3 rounded-sm bg-pink-400"></div>
+                    <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-sm bg-gray-200"></div>
+                    <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-sm bg-pink-100"></div>
+                    <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-sm bg-pink-300"></div>
+                    <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-sm bg-pink-400/80"></div>
+                    <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-sm bg-pink-400"></div>
                   </div>
                   <span>More</span>
                 </div>

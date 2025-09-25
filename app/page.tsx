@@ -1,86 +1,236 @@
-import Link from "next/link";
+import Image from 'next/image';
+import Link from 'next/link';
 
 export default function Home() {
   return (
     <div data-app="parent" className="relative min-h-screen">
-      {/* Delightful, subtle background using brand pink accents */}
-      <div className="pointer-events-none absolute inset-0 -z-10">
-        <div
-          className="absolute -top-24 -left-24 size-[280px] rounded-full bg-pink-300/30 blur-3xl"
-          style={{ animation: "float 10s ease-in-out infinite" }}
-        />
-        <div
-          className="absolute -bottom-28 -right-24 size-[320px] rounded-full bg-accent/40 blur-3xl"
-          style={{ animation: "float 9s ease-in-out infinite reverse" }}
-        />
-      </div>
-
-      <main className="mx-auto max-w-6xl px-6 py-16 md:py-20">
-        {/* Hero */}
+      <main id="main" className="mx-auto max-w-6xl px-6 py-16">
         <section className="grid items-center gap-10 md:grid-cols-2">
           <div>
-            <h1 className="font-serif text-4xl font-extrabold tracking-tight md:text-5xl">
-              Turn your day into a magical bedtime story
+            <h1 className="text-4xl font-extrabold tracking-tight md:text-5xl">
+              Talk about your day <br /> We'll make it bedtime story
             </h1>
             <p className="mt-3 text-base text-muted-foreground md:text-lg">
-              Record a moment, pick a character, and we’ll craft a playful, kid‑friendly story—ready by bedtime.
+              Share a minute about your day. We'll turn it into a gentle,
+              kid‑friendly bedtime story.
             </p>
 
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/parent"
-                className="inline-flex items-center justify-center rounded-lg border border-border bg-card px-5 py-3 text-sm font-medium notion-hover"
+                className="inline-flex drop-shadow-pink-300 drop-shadow-2xl h-11 items-center justify-center rounded-lg border border-border px-5 text-sm font-medium text-white hover:bg-primary/80 bg-primary tap-manipulate focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
-                I’m a Parent
+                Start recording
               </Link>
-              <Link
-                href="/kids"
-                className="inline-flex items-center justify-center rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:brightness-110"
-              >
-                Kids Mode
-              </Link>
-            </div>
-
-            <div className="mt-6 flex items-center gap-4 text-xs text-muted-foreground">
-              <div className="flex items-center gap-2 rounded-full bg-white/70 px-3 py-1 shadow-sm">
-                <span className="inline-block size-2 rounded-full bg-green-500"></span>
-                <span>Real‑time, private by default</span>
-              </div>
-              <div className="hidden md:block">No setup required</div>
             </div>
           </div>
 
-          {/* Preview card */}
-          <div className="relative">
-            <div className="rounded-2xl border border-border bg-white/70 p-5 shadow-md backdrop-blur-sm">
-              <div className="mb-2 text-xs font-medium text-muted-foreground">Tonight’s Story</div>
-              <div className="rounded-xl bg-gradient-to-br from-pink-100 via-white to-accent/30 p-5">
-                <h3 className="font-serif text-2xl font-semibold">The Supermarket Superhero</h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  When the apples tried to roll away, our tiny hero leapt into action!
-                </p>
-                <div className="mt-4 flex gap-2">
-                  <span className="rounded-full bg-pink-100 px-3 py-1 text-xs text-pink-700">Superhero</span>
-                  <span className="rounded-full bg-blue-100 px-3 py-1 text-xs text-blue-700">2 min</span>
+          <div className="relative cloud-frame md:justify-self-end">
+            <Image
+              src="/hero.webp"
+              alt="Kira talking to a kid"
+              width={500}
+              height={500}
+              className="rounded-xl shadow-xl ring-1 ring-border/50"
+              priority
+            />
+          </div>
+        </section>
+
+        {/* How it works */}
+        <section
+          id="how-it-works"
+          className="mt-16 grid gap-4 sm:grid-cols-3 scroll-mt-24"
+        >
+          <div className="rounded-xl border border-border bg-card p-4 notion-card">
+            <div className="text-sm font-semibold">1. Tap the mic and talk</div>
+            <div className="mt-1 text-sm text-muted-foreground">
+              Just a moment or two—it’s enough.
+            </div>
+          </div>
+          <div className="rounded-xl border border-border bg-card p-4 notion-card">
+            <div className="text-sm font-semibold">2. Pick a character</div>
+            <div className="mt-1 text-sm text-muted-foreground">
+              Astronaut, pirate, superhero, and more.
+            </div>
+          </div>
+          <div className="rounded-xl border border-border bg-card p-4 notion-card">
+            <div className="text-sm font-semibold">3. Listen at bedtime</div>
+            <div className="mt-1 text-sm text-muted-foreground">
+              A delightful story, every time.
+            </div>
+          </div>
+        </section>
+
+        {/* Benefits */}
+        <section className="mt-20">
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="rounded-xl border border-border bg-card p-5 hover-lift">
+              <div className="h-28 w-full rounded-lg bg-muted/60 fun-dotted-bg flex items-center justify-center text-xs text-muted-foreground">
+                Image placeholder
+              </div>
+              <h3 className="mt-4 text-base font-semibold">
+                Build a calm habit
+              </h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                A tiny daily reflection that becomes a warm bedtime ritual.
+              </p>
+            </div>
+            <div className="rounded-xl border border-border bg-card p-5 hover-lift">
+              <div className="h-28 w-full rounded-lg bg-muted/60 fun-dotted-bg flex items-center justify-center text-xs text-muted-foreground">
+                Image placeholder
+              </div>
+              <h3 className="mt-4 text-base font-semibold">
+                Turn moments into stories
+              </h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                We stitch your day into gentle, kid‑friendly tales.
+              </p>
+            </div>
+            <div className="rounded-xl border border-border bg-card p-5 hover-lift">
+              <div className="h-28 w-full rounded-lg bg-muted/60 fun-dotted-bg flex items-center justify-center text-xs text-muted-foreground">
+                Image placeholder
+              </div>
+              <h3 className="mt-4 text-base font-semibold">
+                Memories that grow up
+              </h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                A living archive your kids can revisit when they’re older.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Example stories */}
+        <section className="mt-20">
+          <div className="rounded-2xl border border-border bg-card p-6">
+            <div className="mb-4">
+              <h2 className="text-2xl font-semibold tracking-tight">
+                Story examples
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                A peek at the tone and length you can expect.
+              </p>
+            </div>
+            <div className="grid gap-4 md:grid-cols-3">
+              {[1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className="rounded-xl border border-border bg-white p-4"
+                >
+                  <div className="h-24 w-full rounded-lg bg-muted/60 fun-dotted-bg flex items-center justify-center text-xs text-muted-foreground">
+                    Cover placeholder
+                  </div>
+                  <div className="mt-3">
+                    <div className="text-sm font-semibold">
+                      A Tiny Epic from Today
+                    </div>
+                    <p className="mt-1 text-xs text-muted-foreground line-clamp-3">
+                      Once upon an everyday, Kiddo discovered that little
+                      moments can sparkle. Today, something small but special
+                      happened.
+                    </p>
+                  </div>
                 </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Testimonials */}
+        <section className="mt-20">
+          <div className="rounded-2xl border border-border bg-card p-6">
+            <div className="mb-4">
+              <h2 className="text-2xl font-semibold tracking-tight">
+                Loved by busy parents
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Short, sweet voice moments that become bedtime magic.
+              </p>
+            </div>
+            <div className="grid gap-4 md:grid-cols-3">
+              {(
+                [
+                  'It’s our favorite wind‑down.',
+                  'Makes me notice small joys.',
+                  'My kid asks for their story!',
+                ] as const
+              ).map((quote) => (
+                <div
+                  key={quote}
+                  className="rounded-xl border border-border bg-white p-4"
+                >
+                  <div className="text-sm">“{quote}”</div>
+                  <div className="mt-2 text-xs text-muted-foreground">
+                    — Parent
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section className="mt-20">
+          <div className="rounded-2xl border border-border bg-card p-6">
+            <div className="mb-4">
+              <h2 className="text-2xl font-semibold tracking-tight">FAQ</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Quick answers to common questions.
+              </p>
+            </div>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="rounded-xl border border-border bg-white p-4">
+                <div className="text-sm font-semibold">
+                  Are my recordings private?
+                </div>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Yes. Your recordings are private by default.
+                </p>
+              </div>
+              <div className="rounded-xl border border-border bg-white p-4">
+                <div className="text-sm font-semibold">
+                  How long are the stories?
+                </div>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Usually 1–3 minutes—just right for bedtime.
+                </p>
+              </div>
+              <div className="rounded-xl border border-border bg-white p-4">
+                <div className="text-sm font-semibold">Can I edit a story?</div>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Absolutely. Nudge words, swap characters, or save drafts.
+                </p>
+              </div>
+              <div className="rounded-xl border border-border bg-white p-4">
+                <div className="text-sm font-semibold">
+                  Do you support multiple kids?
+                </div>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Yes—tag entries so each child gets their own tale.
+                </p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* How it works */}
-        <section className="mt-16 grid gap-4 sm:grid-cols-3">
-          <div className="rounded-xl border border-border bg-card p-4 notion-card">
-            <div className="text-sm font-semibold">1. Record your day</div>
-            <div className="mt-1 text-sm text-muted-foreground">Just a moment or two—it’s enough.</div>
-          </div>
-          <div className="rounded-xl border border-border bg-card p-4 notion-card">
-            <div className="text-sm font-semibold">2. Pick a character</div>
-            <div className="mt-1 text-sm text-muted-foreground">Astronaut, pirate, superhero, and more.</div>
-          </div>
-          <div className="rounded-xl border border-border bg-card p-4 notion-card">
-            <div className="text-sm font-semibold">3. Read at bedtime</div>
-            <div className="mt-1 text-sm text-muted-foreground">A delightful story, every time.</div>
+        {/* Bottom CTA */}
+        <section className="mt-20 mb-10">
+          <div className="rounded-2xl border border-border bg-gradient-to-br from-pink-50 to-accent/20 p-6 text-center">
+            <h2 className="text-2xl font-semibold tracking-tight">
+              Ready to start your family’s story?
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Take 60 seconds today and listen together tonight.
+            </p>
+            <div className="mt-4 flex items-center justify-center">
+              <Link
+                href="/parent"
+                className="inline-flex h-11 items-center justify-center rounded-md bg-primary px-6 text-sm font-semibold text-primary-foreground tap-manipulate focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              >
+                Start recording
+              </Link>
+            </div>
           </div>
         </section>
       </main>

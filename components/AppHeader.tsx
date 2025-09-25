@@ -1,10 +1,9 @@
 'use client';
 
 import { useQuery } from 'convex/react';
-import { BookOpen, Flame, Sparkles, Star } from 'lucide-react';
+import { Flame, Star } from 'lucide-react';
 import Image from 'next/image';
 import { useMemo } from 'react';
-import { Button } from '@/components/ui/button';
 import { api } from '@/convex/_generated/api';
 
 export default function AppHeader({
@@ -48,31 +47,37 @@ export default function AppHeader({
   }, [activityData, storyStats]);
 
   return (
-    <header className="bg-transparent">
-      <div className="max-w-5xl mx-auto px-8 py-6">
+    <header className="fixed top-0 left-0 right-0 z-50 px-4 pt-4 pb-2 backdrop-blur-sm ">
+      <div className="max-w-5xl mx-auto px-4 py-2 rounded-4xl border shadow-sm bg-slate-50/90">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-white shadow-sm border border-border rounded-xl flex items-center justify-center">
-              <BookOpen className="h-4 w-4 text-primary" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-semibold text-foreground font-serif tracking-tight">
-                Parent Story
-              </h1>
-              <p className="text-sm text-muted-foreground">
-                Make every day a little adventure
-              </p>
+            <div className="flex items-center gap-2">
+              <Image
+                src="/kira.webp"
+                alt="Kira"
+                width={64}
+                height={64}
+                className="object-cover rounded-md backdrop-blur-2xl"
+              />
+
+              <div>
+                <h1 className="text-2xl font-black text-foreground tracking-tight">
+                  Kira
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                  Make every day a little story
+                </p>
+              </div>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            {/* Streak chip */}
             <div className="hidden sm:flex items-center gap-1.5 rounded-full bg-white border border-border shadow-xs px-3 h-8 text-xs text-muted-foreground">
-              <Flame className="h-3.5 w-3.5 text-orange-500" />
+              <Flame className="h-3.5 w-3.5 text-orange-500 fill-orange-200" />
               <span>
-                {streak} day{streak === 1 ? '' : 's'} streak
+                {streak} day{streak > 1 ? 's' : ''} streak
               </span>
             </div>
-            {/* XP chip with progress */}
+
             <div className="hidden md:flex items-center gap-2 rounded-full bg-white border border-border shadow-xs px-3 h-8 text-xs text-muted-foreground">
               <Star className="h-3.5 w-3.5 text-yellow-500" />
               <span>Lv {level}</span>
@@ -84,23 +89,7 @@ export default function AppHeader({
               </div>
               <span className="tabular-nums">{xp} XP</span>
             </div>
-            {/* Total stories chip */}
-            <div className="hidden sm:flex items-center gap-2 rounded-full bg-white border border-border shadow-xs px-3 h-8 text-xs text-muted-foreground">
-              <Sparkles className="h-3.5 w-3.5 text-yellow-500" />
-              <span>{storyCount} stories</span>
-            </div>
-            <Button variant="outline" size="sm" className="h-8 bg-white/70">
-              Family
-            </Button>
-            <div className="w-8 h-8 rounded-full overflow-hidden border border-border shadow-xs">
-              <Image
-                src="/kira.webp"
-                alt="Kira"
-                width={32}
-                height={32}
-                className="object-cover"
-              />
-            </div>
+            {/* {clerk} */}
           </div>
         </div>
       </div>

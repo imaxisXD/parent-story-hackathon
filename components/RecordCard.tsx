@@ -1,19 +1,20 @@
 'use client';
-import { useConversation } from '@elevenlabs/react';
 import { MeshGradient, PulsingBorder } from '@paper-design/shaders-react';
 import { Loader, MicOff } from 'lucide-react';
 import Image from 'next/image';
 import { useMemo } from 'react';
 import { cn } from '@/lib/utils';
+import { useVapi } from '../hooks/useVapi';
 import { Button } from './ui/button';
 
 export default function RecordCard() {
-  const { isSpeaking, startSession, status, endSession } = useConversation();
+  const { status, isSpeaking, error, start, stop } = useVapi();
   const cardState = useMemo(() => {
+    if (error) return 'error';
     if (isSpeaking) return 'ai-speaking';
     return status;
-  }, [status, isSpeaking]);
-  console.log('cardState', cardState);
+  }, [status, isSpeaking, error]);
+
   const handleStartRecording = async () => {
     try {
       if (
@@ -23,32 +24,22 @@ export default function RecordCard() {
         cardState === 'disconnecting'
       )
         return;
-      await navigator.mediaDevices.getUserMedia({ audio: true });
-      await startSession({
-        agentId: 'agent_4601k3h4kmvkfykv50nv1knm25xy',
-        connectionType: 'websocket',
-        dynamicVariables: {
-          user_name: 'Angelo',
-        },
-        onMessage: (message) => {
-          console.log('Message:', message);
-        },
-      });
+      await start();
     } catch (error) {
-      console.error('Failed to start recording:', error);
+      console.warn('Failed to start recording:', error);
     }
   };
 
   const handleStopRecording = async () => {
     try {
-      await endSession();
+      await stop();
     } catch (error) {
-      console.error('Failed to stop recording:', error);
+      console.warn('Failed to stop recording:', error);
     }
   };
 
   return (
-    <div className="relative rounded-3xl overflow-hidden p-[3px]">
+    <div className="relative rounded-3xl overflow-hidden border border-pink-200">
       <div className="pointer-events-none absolute inset-0 z-0">
         <PulsingBorder
           style={{ height: '100%', width: '100%' }}
@@ -77,13 +68,14 @@ export default function RecordCard() {
       </div>
       <div
         className={cn(
-          'relative z-10 rounded-[inherit] transition-all duration-500 p-4 pt-6 drop-shadow backdrop-blur-sm',
+          'relative z-10 rounded-[inherit] transition-all duration-500 p-4 pt-6',
           cardState === 'disconnected' &&
-            'bg-gradient-to-br from-white to-white/90',
+            'bg-gradient-to-b from-cyan-50/50 to-pink-50',
           cardState === 'connecting' && 'bg-amber-50/10',
           cardState === 'connected' && 'bg-green-50/10',
           cardState === 'disconnecting' && 'bg-orange-50/10',
-          cardState === 'ai-speaking' && 'bg-white/10'
+          cardState === 'ai-speaking' && 'bg-transparent',
+          cardState === 'error' && 'bg-red-50/10'
         )}
       >
         <div className="flex flex-col items-center space-y-6">
@@ -93,10 +85,11 @@ export default function RecordCard() {
               disabled={
                 cardState === 'connecting' ||
                 cardState === 'disconnecting' ||
-                status === 'connected'
+                status === 'connected' ||
+                cardState === 'error'
               }
               className={cn(
-                'relative hover:scale-105 transition-all duration-300 w-[110px] h-[110px] border border-dashed border-sky-300 rounded-full overflow-hidden focus:outline-none disabled:opacity-60 disabled:cursor-not-allowed',
+                'relative hover:scale-105 transition-all duration-300 w-[110px] h-[110px] border border-sky-400 rounded-full overflow-hidden focus:outline-none disabled:opacity-60 disabled:cursor-not-allowed',
                 cardState === 'connecting' && 'animate-pulse'
               )}
               type="button"
@@ -124,7 +117,7 @@ export default function RecordCard() {
                 {(cardState === 'connected' ||
                   cardState === 'disconnected') && (
                   <Image
-                    src="/kira.webp"
+                    src="/kira-mic.webp"
                     alt="Kira"
                     width={140}
                     height={140}
@@ -164,11 +157,23 @@ export default function RecordCard() {
           <div className="text-center space-y-2 min-h-12">
             {cardState === 'disconnected' && (
               <>
-                <h3 className="text-base font-medium text-foreground font-serif">
+                <h3 className="text-base font-medium text-foreground">
                   Ready to Begin
                 </h3>
                 <p className="text-xs text-muted-foreground">
                   Click the microphone to start a new story session
+                </p>
+              </>
+            )}
+
+            {cardState === 'error' && (
+              <>
+                <h3 className="text-base font-medium text-red-600">
+                  Connection Error
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  {error ||
+                    'Something went wrong. Please refresh and try again.'}
                 </p>
               </>
             )}
@@ -189,11 +194,11 @@ export default function RecordCard() {
 
             {cardState === 'connected' && (
               <>
-                <h3 className="text-base font-medium text-foreground font-serif">
+                <h3 className="text-base font-medium text-foreground">
                   Listening...
                 </h3>
                 <p className="text-xs text-muted-foreground">
-                  Lets talk about your day.
+                  Let's talk about your day.
                 </p>
               </>
             )}

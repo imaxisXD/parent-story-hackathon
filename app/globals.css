@@ -8,7 +8,6 @@
   --card-foreground: oklch(0.2795 0.0368 260.0310);
   --popover: oklch(1.0000 0 0);
   --popover-foreground: oklch(0.2795 0.0368 260.0310);
-  /* Brand pink per project rules */
   --primary: #ec4899;
   --primary-foreground: #ffffff;
   --secondary: oklch(0.9276 0.0058 264.5313);
@@ -69,14 +68,48 @@
     background-image: radial-gradient(circle at 1px 1px, rgba(0,0,0,0.05) 1px, transparent 0);
     background-size: 16px 16px;
   }
+
+  /* Touch-friendly interactions */
+  .tap-manipulate { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+
+  /* Motion-safe animation helpers */
+  @media (prefers-reduced-motion: no-preference) {
+    .ms-float-10 { animation: float 10s ease-in-out infinite; }
+    .ms-float-9-rev { animation: float 9s ease-in-out infinite reverse; }
+  }
+
+  /* Cloudy gradient frame for hero art */
+  .cloud-frame {
+    position: relative;
+    display: inline-block;
+    padding: 20px; /* room for the glow */
+    border-radius: 20px;
+    background:
+      radial-gradient(120px 120px at 15% 20%, rgba(236, 72, 153, 0.20), transparent 60%),
+      radial-gradient(160px 160px at 85% 25%, rgba(96, 165, 250, 0.18), transparent 60%),
+      radial-gradient(200px 180px at 50% 90%, rgba(167, 139, 250, 0.18), transparent 60%),
+      radial-gradient(240px 200px at 50% 50%, rgba(236, 72, 153, 0.10), transparent 70%);
+    box-shadow:
+      0 20px 40px -20px rgba(0, 0, 0, 0.15),
+      inset 0 0 0 1px color-mix(in oklab, var(--border), transparent 50%);
+  }
+  .cloud-frame::before {
+    content: "";
+    position: absolute;
+    inset: -20px;
+    border-radius: 28px;
+    background:
+      radial-gradient(180px 150px at 20% 15%, rgba(236, 72, 153, 0.18), transparent 60%),
+      radial-gradient(220px 180px at 80% 20%, rgba(96, 165, 250, 0.16), transparent 60%),
+      radial-gradient(260px 220px at 50% 85%, rgba(167, 139, 250, 0.14), transparent 60%);
+    filter: blur(22px);
+    z-index: -1;
+  }
 }
 
+/* biome-ignore lint/suspicious/noUnknownAtRules: Tailwind CSS theme inline */
 @theme inline {
-  /* Fonts are provided via next/font and exposed to CSS variables in layout */
-  --font-sans: var(--font-rubik);
-  --font-serif: var(--font-grandstander);
-  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-
+  --font-bricolage-grotesque: var(--font-bricolage-grotesque);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -126,59 +159,10 @@
 }
 
 @layer base {
+  /* biome-ignore lint/suspicious/noUnknownAtRules: Tailwind CSS apply */
   * { @apply border-border outline-ring/50; }
-  body { @apply bg-background text-foreground font-sans overflow-x-hidden; }
-}
-
-/* Theming: override tokens per app mode using data-app wrapper */
-/* Parent mode — calm, mature */
-[data-app="parent"] {
-  --background: oklch(1 0 0); /* white */
-  --foreground: oklch(0.28 0.037 260.03);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.28 0.037 260.03);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.28 0.037 260.03);
-  --primary: #ec4899; /* brand pink, used sparingly in parent mode */
-  --primary-foreground: #ffffff;
-  --secondary: oklch(0.96 0.01 264.5);
-  --secondary-foreground: oklch(0.37 0.03 259.73);
-  --muted: oklch(0.97 0.003 264.54);
-  --muted-foreground: oklch(0.55 0.023 264.36);
-  --accent: oklch(0.96 0.01 264.5);
-  --accent-foreground: oklch(0.37 0.03 259.73);
-  --destructive: oklch(0.64 0.208 25.33);
-  --destructive-foreground: #ffffff;
-  --border: oklch(0.90 0.006 258.34);
-  --input: oklch(0.90 0.006 258.34);
-  --ring: oklch(0.77 0.04 260);
-
-  /* Calmer, mature typography and shapes */
-  --font-sans: var(--font-inter);
-  --radius: 0.5rem;
-}
-
-/* Kids mode — playful, saturated */
-[data-app="kids"] {
-  --background: oklch(0.99 0.02 330); /* very soft pink */
-  --foreground: oklch(0.33 0.05 330);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.33 0.05 330);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.33 0.05 330);
-  --primary: #ec4899; /* brand pink */
-  --primary-foreground: #ffffff;
-  --secondary: oklch(0.94 0.03 280);
-  --secondary-foreground: oklch(0.35 0.04 280);
-  --muted: oklch(0.97 0.01 330);
-  --muted-foreground: oklch(0.45 0.03 330);
-  --accent: oklch(0.92 0.06 290);
-  --accent-foreground: oklch(0.30 0.05 290);
-  --destructive: oklch(0.64 0.208 25.33);
-  --destructive-foreground: #ffffff;
-  --border: oklch(0.88 0.012 258.34);
-  --input: oklch(0.88 0.012 258.34);
-  --ring: oklch(0.70 0.12 330);
+  /* biome-ignore lint/suspicious/noUnknownAtRules: Tailwind CSS apply */
+  body { @apply text-foreground font-bricolage-grotesque overflow-x-hidden; }
 }
 
 /* Keyframes for playful motion */

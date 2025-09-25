@@ -1,13 +1,14 @@
-"use client";
+'use client';
 
-import { useEffect, useMemo, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Play, Star } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Play, Star } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import type { Id } from '@/convex/_generated/dataModel';
+import { cn } from '@/lib/utils';
 
 export type Story = {
-  _id?: string;
+  _id: Id<'stories'>;
   emoji: string;
   title: string;
   characterName: string;
@@ -17,13 +18,17 @@ export type Story = {
   createdAt: number; // timestamp
 };
 
-export type StoriesView = "grid" | "list";
-export type StoriesSort = "recent" | "mostPlayed" | "highestRated" | "longest";
+export type StoriesView = 'grid' | 'list';
+export type StoriesSort = 'recent' | 'mostPlayed' | 'highestRated' | 'longest';
 
 function isToday(ts: number) {
   const d = new Date(ts);
   const t = new Date();
-  return d.getFullYear() === t.getFullYear() && d.getMonth() === t.getMonth() && d.getDate() === t.getDate();
+  return (
+    d.getFullYear() === t.getFullYear() &&
+    d.getMonth() === t.getMonth() &&
+    d.getDate() === t.getDate()
+  );
 }
 function isThisWeek(ts: number) {
   const d = new Date(ts);
@@ -40,14 +45,14 @@ function isThisWeek(ts: number) {
 
 function monthKey(ts: number) {
   const d = new Date(ts);
-  return `${d.toLocaleString("en-US", { month: "long" })} ${d.getFullYear()}`;
+  return `${d.toLocaleString('en-US', { month: 'long' })} ${d.getFullYear()}`;
 }
 
 function formatRelative(date: number) {
   const diff = Date.now() - date;
   const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  if (days === 0) return "Today";
-  if (days === 1) return "Yesterday";
+  if (days === 0) return 'Today';
+  if (days === 1) return 'Yesterday';
   if (days < 7) return `${days} days ago`;
   return new Date(date).toLocaleDateString();
 }
@@ -73,13 +78,13 @@ export default function StoriesGroupedList({
   sort: StoriesSort;
   search: string;
   selectedDate?: string;
-  onPlay: (id: any) => void;
+  onPlay: (id: Id<'stories'>) => void;
 }) {
   const [showMonths, setShowMonths] = useState<number>(3); // reveal more on demand
   const [favorites, setFavorites] = useState<Record<string, boolean>>(() => {
-    if (typeof window === "undefined") return {};
+    if (typeof window === 'undefined') return {};
     try {
-      const raw = localStorage.getItem("ps:favorites");
+      const raw = localStorage.getItem('ps:favorites');
       return raw ? JSON.parse(raw) : {};
     } catch {
       return {};
@@ -88,28 +93,29 @@ export default function StoriesGroupedList({
 
   useEffect(() => {
     try {
-      localStorage.setItem("ps:favorites", JSON.stringify(favorites));
+      localStorage.setItem('ps:favorites', JSON.stringify(favorites));
     } catch {}
   }, [favorites]);
 
   const filteredSorted = useMemo(() => {
     const term = search.trim().toLowerCase();
-    let arr = stories.filter((s) => {
+    const arr = stories.filter((s) => {
       const matchesText = term
-        ? s.title.toLowerCase().includes(term) || s.characterName.toLowerCase().includes(term)
+        ? s.title.toLowerCase().includes(term) ||
+          s.characterName.toLowerCase().includes(term)
         : true;
       const matchesDate = selectedDate
-        ? new Date(s.createdAt).toISOString().split("T")[0] === selectedDate
+        ? new Date(s.createdAt).toISOString().split('T')[0] === selectedDate
         : true;
       return matchesText && matchesDate;
     });
     arr.sort((a, b) => {
       switch (sort) {
-        case "mostPlayed":
+        case 'mostPlayed':
           return b.plays - a.plays;
-        case "highestRated":
+        case 'highestRated':
           return b.rating - a.rating;
-        case "longest":
+        case 'longest':
           return b.duration - a.duration;
         default:
           return b.createdAt - a.createdAt;
@@ -129,14 +135,15 @@ export default function StoriesGroupedList({
       else {
         const key = monthKey(s.createdAt);
         if (!byMonth.has(key)) byMonth.set(key, []);
-        byMonth.get(key)!.push(s);
+        const list = byMonth.get(key);
+        if (list) list.push(s);
       }
     }
 
     // Prepare months list newest first
     const months = Array.from(byMonth.entries()).sort((a, b) => {
-      const [am, ay] = a[0].split(" ");
-      const [bm, by] = b[0].split(" ");
+      const [am, ay] = a[0].split(' ');
+      const [bm, by] = b[0].split(' ');
       const aDate = new Date(`${am} 1, ${ay}`);
       const bDate = new Date(`${bm} 1, ${by}`);
       return bDate.getTime() - aDate.getTime();
@@ -147,7 +154,9 @@ export default function StoriesGroupedList({
 
   const storyOfTheDay = useMemo(() => {
     if (!selectedDate && (groups.today?.length ?? 0) > 0) {
-      return [...groups.today].sort((a, b) => b.rating - a.rating || b.plays - a.plays)[0];
+      return [...groups.today].sort(
+        (a, b) => b.rating - a.rating || b.plays - a.plays
+      )[0];
     }
     return undefined;
   }, [groups.today, selectedDate]);
@@ -161,8 +170,8 @@ export default function StoriesGroupedList({
     return (
       <div
         className={cn(
-          "group relative rounded-2xl border border-border bg-card p-4 shadow-xs hover:shadow-md hover-lift overflow-hidden",
-          highlight && "ring-2 ring-primary/40"
+          'group relative rounded-2xl border border-border bg-card p-4 shadow-xs hover:shadow-md hover-lift overflow-hidden',
+          highlight && 'ring-2 ring-primary/40'
         )}
       >
         <div className="absolute -top-6 -right-6 size-16 rounded-full bg-pink-200/40 blur-2xl" />
@@ -175,13 +184,16 @@ export default function StoriesGroupedList({
                 {s.characterName}
               </Badge>
               <button
+                type="button"
                 onClick={() => toggleFav(s._id as string)}
                 className={cn(
-                  "text-xs px-2 h-6 rounded-full border",
-                  favorites[s._id as string] ? "border-primary text-primary bg-primary/10" : "border-border text-muted-foreground bg-white"
+                  'text-xs px-2 h-6 rounded-full border',
+                  favorites[s._id as string]
+                    ? 'border-primary text-primary bg-primary/10'
+                    : 'border-border text-muted-foreground bg-white'
                 )}
               >
-                {favorites[s._id as string] ? "★ Favorite" : "☆ Favorite"}
+                {favorites[s._id as string] ? '★ Favorite' : '☆ Favorite'}
               </button>
               {highlight && (
                 <span className="text-[10px] px-2 h-6 inline-flex items-center rounded-full bg-fun-yellow/30 border border-yellow-300/70">
@@ -195,11 +207,13 @@ export default function StoriesGroupedList({
           <div className="flex items-center gap-3">
             <span>{formatDuration(s.duration)}</span>
             <span>•</span>
-            <span>{s.plays} plays</span>
-            <span>•</span>
+
             <span className="flex items-center gap-1">
-              {[...Array(s.rating)].map((_, i) => (
-                <Star key={i} className="h-3 w-3 text-yellow-500 fill-current" />
+              {Array.from({ length: s.rating }).map((_, starIndex) => (
+                <Star
+                  key={`${s._id || s.title}-star-${starIndex}`}
+                  className="h-3 w-3 text-yellow-500 fill-current"
+                />
               ))}
             </span>
           </div>
@@ -222,21 +236,29 @@ export default function StoriesGroupedList({
 
   function Row({ s, highlight }: { s: Story; highlight?: boolean }) {
     return (
-      <div className={cn("flex items-center gap-3 p-3 rounded-xl border border-border bg-card hover-lift", highlight && "ring-2 ring-primary/40")}>        
-        <div className="text-xl w-7 text-center">{s.emoji}</div>
+      <div
+        className={cn(
+          'flex items-center gap-3 p-3 rounded-xl border border-border bg-card hover-lift',
+          highlight && 'ring-2 ring-primary/40'
+        )}
+      >
+        <div className="text-xl w-7 text-center">🦸🏻</div>
         <div className="flex-1 min-w-0">
           <div className="font-medium truncate">{s.title}</div>
           <div className="text-xs text-muted-foreground truncate">
-            {s.characterName} • {formatDuration(s.duration)} • {s.plays} plays
+            Duration {formatDuration(s.duration)}
           </div>
         </div>
-        <div className="hidden sm:flex items-center gap-1">
-          {[...Array(s.rating)].map((_, i) => (
-            <Star key={i} className="h-3 w-3 text-yellow-500 fill-current" />
-          ))}
+
+        <div className="text-xs text-muted-foreground w-24 text-right">
+          {formatRelative(s.createdAt)}
         </div>
-        <div className="text-xs text-muted-foreground w-24 text-right">{formatRelative(s.createdAt)}</div>
-        <Button variant="default" size="icon" className="rounded-full" onClick={() => onPlay(s._id)}>
+        <Button
+          variant="default"
+          size="icon"
+          className="rounded-full"
+          onClick={() => onPlay(s._id)}
+        >
           <Play className="h-4 w-4" />
         </Button>
       </div>
@@ -249,24 +271,34 @@ export default function StoriesGroupedList({
       <GroupHeader title="Today" count={groups.today.length} />
       {groups.today.length === 0 ? (
         <EmptyDay />
-      ) : view === "grid" ? (
+      ) : view === 'grid' ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {groups.today.map((s) => (
-            <Card key={s._id || s.title} s={s} highlight={storyOfTheDay?._id === s._id} />
+            <Card
+              key={s._id || s.title}
+              s={s}
+              highlight={storyOfTheDay?._id === s._id}
+            />
           ))}
         </div>
       ) : (
         <div className="space-y-2">
           {groups.today.map((s) => (
-            <Row key={s._id || s.title} s={s} highlight={storyOfTheDay?._id === s._id} />
+            <Row
+              key={s._id || s.title}
+              s={s}
+              highlight={storyOfTheDay?._id === s._id}
+            />
           ))}
         </div>
       )}
 
       {/* This Week */}
-      {groups.week.length > 0 && <GroupHeader title="This Week" count={groups.week.length} />}
       {groups.week.length > 0 && (
-        view === "grid" ? (
+        <GroupHeader title="This Week" count={groups.week.length} />
+      )}
+      {groups.week.length > 0 &&
+        (view === 'grid' ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {groups.week.map((s) => (
               <Card key={s._id || s.title} s={s} />
@@ -278,14 +310,13 @@ export default function StoriesGroupedList({
               <Row key={s._id || s.title} s={s} />
             ))}
           </div>
-        )
-      )}
+        ))}
 
       {/* Earlier months */}
       {groups.months.slice(0, showMonths).map(([label, items]) => (
         <div key={label} className="space-y-3">
           <MonthHeader label={label} count={items.length} />
-          {view === "grid" ? (
+          {view === 'grid' ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {items.map((s) => (
                 <Card key={s._id || s.title} s={s} />
@@ -303,7 +334,11 @@ export default function StoriesGroupedList({
 
       {groups.months.length > showMonths && (
         <div className="flex justify-center">
-          <Button variant="outline" size="sm" onClick={() => setShowMonths((n) => n + 3)}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowMonths((n) => n + 3)}
+          >
             Show older months
           </Button>
         </div>
@@ -316,7 +351,7 @@ function GroupHeader({ title, count }: { title: string; count: number }) {
   return (
     <div className="sticky top-0 z-10 -mx-2 px-2 py-1.5 bg-gradient-to-b from-white/90 to-white/70 backdrop-blur supports-[backdrop-filter]:bg-white/60 rounded">
       <div className="flex items-center gap-2">
-        <h3 className="text-lg font-semibold font-serif">{title}</h3>
+        <h3 className="text-lg font-semibold">{title}</h3>
         <span className="text-xs text-muted-foreground">{count}</span>
       </div>
     </div>
@@ -335,7 +370,7 @@ function MonthHeader({ label, count }: { label: string; count: number }) {
 function EmptyDay() {
   return (
     <div className="rounded-2xl border border-dashed border-border p-8 text-center text-muted-foreground bg-white/60">
-      No story yet today — save your streak!
+      No story yet today — tap the mic to save your streak!
     </div>
   );
 }
