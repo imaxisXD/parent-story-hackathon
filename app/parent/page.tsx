@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery } from 'convex/react';
 import dynamic from 'next/dynamic';
+
 import { useState } from 'react';
 import ActivityCalendar from '@/components/ActivityCalendar';
 import AppHeader from '@/components/AppHeader';
@@ -41,84 +42,69 @@ export default function ParentHome() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-white relative overflow-x-hidden">
-      {/* Pink Corner Dream Background */}
-      <div
-        className="fixed inset-0 z-0 pointer-events-none"
-        style={{
-          backgroundImage: `
-        radial-gradient(circle 600px at 0% 200px, #fce7f378, transparent),
-        radial-gradient(circle 600px at 100% 200px, #fce7f378, transparent),
-        radial-gradient(circle 600px at 0% calc(100% - 200px), #cee7f078, transparent),
-        radial-gradient(circle 600px at 100% calc(100% - 200px), #fce7f378, transparent)
-      `,
-        }}
-      />
-      <div className="relative z-10">
-        <AppHeader storyCount={storyStats?.totalStories ?? 0} />
+    <div className="relative z-10">
+      <AppHeader storyCount={storyStats?.totalStories ?? 0} />
+      <main className="mx-auto max-w-4xl px-6 py-34">
+        <div className="space-y-12">
+          <section className="space-y-4">
+            <div className="mb-2">
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
+                Journal out loud
+              </h2>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Speak about your day for a minute. We’ll shape it into a calm
+                bedtime story to listen together.
+              </p>
+            </div>
+            <RecordCard />
+          </section>
 
-        <main className="mx-auto max-w-4xl px-6 py-8 pt-36 md:pt-40">
-          <div className="space-y-12">
-            <section className="space-y-4">
-              <div className="mb-2">
-                <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
-                  Tell Kira about your day
-                </h2>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Share a short voice note about your day. We’ll gently turn it
-                  into a bedtime story.
-                </p>
+          {/* Section 2: Your Daily Stories */}
+          <section className="space-y-4">
+            <div className="mb-2">
+              <h2 className="text-2xl font-medium tracking-tight">
+                Your stories
+              </h2>
+              <p className="mt-2 text-sm text-muted-foreground">
+                A gentle timeline of your days.
+              </p>
+            </div>
+            <div className="rounded-xl border border-border bg-card p-4">
+              {/* Inline, compact, muted calendar */}
+
+              <ActivityCalendar showLegend={true} showStats={true} />
+
+              <div className="mt-4">
+                {stories && stories.length > 0 ? (
+                  <StoriesGroupedList
+                    stories={stories}
+                    view={'list'}
+                    sort={'recent'}
+                    search={''}
+                    selectedDate={selectedDate}
+                    onPlay={handlePlayStory}
+                  />
+                ) : (
+                  <div className="rounded-lg border border-border/70 p-8 text-center text-muted-foreground">
+                    {stories === undefined ? (
+                      <span>Loading your stories…</span>
+                    ) : (
+                      <span>No stories yet. Tap the mic above to begin.</span>
+                    )}
+                  </div>
+                )}
               </div>
-              <RecordCard />
-            </section>
-
-            {/* Section 2: Your Daily Stories */}
-            <section className="space-y-4">
-              <div className="mb-2">
-                <h2 className="text-2xl font-medium tracking-tight">
-                  Your stories
-                </h2>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  A calm timeline of recent voice‑created stories.
-                </p>
-              </div>
-              <div className="rounded-xl border border-border bg-card p-4">
-                {/* Inline, compact, muted calendar */}
-
-                <ActivityCalendar showLegend={true} showStats={true} />
-
-                <div className="mt-4">
-                  {stories && stories.length > 0 ? (
-                    <StoriesGroupedList
-                      stories={stories}
-                      view={'list'}
-                      sort={'recent'}
-                      search={''}
-                      selectedDate={selectedDate}
-                      onPlay={handlePlayStory}
-                    />
-                  ) : (
-                    <div className="rounded-lg border border-border/70 p-8 text-center text-muted-foreground">
-                      {stories === undefined ? (
-                        <span>Loading your stories…</span>
-                      ) : (
-                        <span>No stories yet. Tap the mic above to begin.</span>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </section>
-          </div>
-        </main>
-        {showPlayer && (
-          <AudioPlayerBar
-            story={activeStory}
-            autoplay={true}
-            onClose={() => setShowPlayer(false)}
-          />
-        )}
-      </div>
+            </div>
+          </section>
+        </div>
+      </main>
+      {showPlayer && (
+        <AudioPlayerBar
+          story={activeStory}
+          autoplay={true}
+          onClose={() => setShowPlayer(false)}
+        />
+      )}
     </div>
   );
 }

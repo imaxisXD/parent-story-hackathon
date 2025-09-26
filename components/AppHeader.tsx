@@ -48,15 +48,15 @@ export default function AppHeader({
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 px-4 pt-4 pb-2 backdrop-blur-sm ">
-      <div className="max-w-5xl mx-auto px-4 py-2 rounded-4xl border border-white shadow-sm backdrop-blur-sm bg-black/80">
+      <div className="max-w-5xl mx-auto px-4 py-1 rounded-2xl border border-pink-400 shadow-sm bg-[#227effcc] backdrop-blur-sm">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
               <Image
-                src="/kira.webp"
+                src="/kira-mic-nobg.png"
                 alt="Kira"
-                width={64}
-                height={64}
+                width={54}
+                height={54}
                 className="object-cover rounded-full"
               />
 
@@ -64,8 +64,8 @@ export default function AppHeader({
                 <h1 className="text-2xl font-black tracking-tight text-white">
                   Kira
                 </h1>
-                <p className="text-sm text-gray-300">
-                  Make every day a little story
+                <p className="text-sm text-gray-200">
+                  Voice journal your day. Listen together at bedtime.
                 </p>
               </div>
             </div>

@@ -1,18 +1,27 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import PublicFooter from '@/components/PublicFooter';
+import PublicHeader from '@/components/PublicHeader';
 
 export default function Home() {
   return (
     <div data-app="parent" className="relative min-h-screen">
-      <main id="main" className="mx-auto max-w-6xl px-6 py-16">
+      <PublicHeader />
+      <main id="main" className="mx-auto max-w-6xl px-6 py-24">
         <section className="grid items-center gap-10 md:grid-cols-2">
           <div>
-            <h1 className="text-4xl font-extrabold tracking-tight md:text-5xl">
-              Talk about your day <br /> We'll make it bedtime story
+            <h1 className="text-4xl font-extrabold tracking-tight md:text-5xl leading-13 ">
+              <span>
+                <span className="text-primary">Voice‑journal</span> your day
+              </span>{' '}
+              <br />
+              We’ll make it a{' '}
+              <span className="text-blue-600">bedtime story</span>
             </h1>
-            <p className="mt-3 text-base text-muted-foreground md:text-lg">
-              Share a minute about your day. We'll turn it into a gentle,
-              kid‑friendly bedtime story.
+            <p className="mt-4 text-base text-muted-foreground md:text-lg">
+              Take a minute to speak your day out loud. Feel lighter, notice the
+              small wins, and end the night with a gentle story to listen with
+              your kid.
             </p>
 
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
@@ -43,37 +52,37 @@ export default function Home() {
           className="mt-16 grid gap-4 sm:grid-cols-3 scroll-mt-24"
         >
           <div className="rounded-xl border border-border bg-card p-4 notion-card">
-            <div className="text-sm font-semibold">1. Tap the mic and talk</div>
+            <div className="text-sm font-semibold">1. Journal by talking</div>
             <div className="mt-1 text-sm text-muted-foreground">
-              Just a moment or two—it’s enough.
+              A minute is enough.
             </div>
           </div>
           <div className="rounded-xl border border-border bg-card p-4 notion-card">
-            <div className="text-sm font-semibold">2. Pick a character</div>
+            <div className="text-sm font-semibold">
+              2. We craft a calm story
+            </div>
             <div className="mt-1 text-sm text-muted-foreground">
-              Astronaut, pirate, superhero, and more.
+              Kid‑friendly and short.
             </div>
           </div>
           <div className="rounded-xl border border-border bg-card p-4 notion-card">
-            <div className="text-sm font-semibold">3. Listen at bedtime</div>
+            <div className="text-sm font-semibold">3. Listen together</div>
             <div className="mt-1 text-sm text-muted-foreground">
-              A delightful story, every time.
+              Make bedtime warm and easy.
             </div>
           </div>
         </section>
 
         {/* Benefits */}
-        <section className="mt-20">
+        <section id="faq" className="mt-20">
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="rounded-xl border border-border bg-card p-5 hover-lift">
               <div className="h-28 w-full rounded-lg bg-muted/60 fun-dotted-bg flex items-center justify-center text-xs text-muted-foreground">
                 Image placeholder
               </div>
-              <h3 className="mt-4 text-base font-semibold">
-                Build a calm habit
-              </h3>
+              <h3 className="mt-4 text-base font-semibold">Feel lighter</h3>
               <p className="mt-1 text-sm text-muted-foreground">
-                A tiny daily reflection that becomes a warm bedtime ritual.
+                A tiny daily check‑in, out loud.
               </p>
             </div>
             <div className="rounded-xl border border-border bg-card p-5 hover-lift">
@@ -81,10 +90,10 @@ export default function Home() {
                 Image placeholder
               </div>
               <h3 className="mt-4 text-base font-semibold">
-                Turn moments into stories
+                Turn days into stories
               </h3>
               <p className="mt-1 text-sm text-muted-foreground">
-                We stitch your day into gentle, kid‑friendly tales.
+                Moments become short, gentle tales.
               </p>
             </div>
             <div className="rounded-xl border border-border bg-card p-5 hover-lift">
@@ -92,10 +101,10 @@ export default function Home() {
                 Image placeholder
               </div>
               <h3 className="mt-4 text-base font-semibold">
-                Memories that grow up
+                A keepsake you’ll revisit
               </h3>
               <p className="mt-1 text-sm text-muted-foreground">
-                A living archive your kids can revisit when they’re older.
+                Your calm archive of everyday life.
               </p>
             </div>
           </div>
@@ -109,7 +118,7 @@ export default function Home() {
                 Story examples
               </h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                A peek at the tone and length you can expect.
+                Short, soothing, bedtime‑ready.
               </p>
             </div>
             <div className="grid gap-4 md:grid-cols-3">
@@ -123,12 +132,10 @@ export default function Home() {
                   </div>
                   <div className="mt-3">
                     <div className="text-sm font-semibold">
-                      A Tiny Epic from Today
+                      A tiny win today
                     </div>
                     <p className="mt-1 text-xs text-muted-foreground line-clamp-3">
-                      Once upon an everyday, Kiddo discovered that little
-                      moments can sparkle. Today, something small but special
-                      happened.
+                      A calm, kind retelling from your day.
                     </p>
                   </div>
                 </div>
@@ -145,7 +152,7 @@ export default function Home() {
                 Loved by busy parents
               </h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                Short, sweet voice moments that become bedtime magic.
+                Journaling that kids love listening to.
               </p>
             </div>
             <div className="grid gap-4 md:grid-cols-3">
@@ -234,6 +241,7 @@ export default function Home() {
           </div>
         </section>
       </main>
+      <PublicFooter />
     </div>
   );
 }
