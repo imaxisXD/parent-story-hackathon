@@ -4,8 +4,11 @@ import { useMutation, useQuery } from 'convex/react';
 import { useState } from 'react';
 import ActivityCalendar from '@/components/ActivityCalendar';
 import AppHeader from '@/components/AppHeader';
+import AudioPlayerBar from '@/components/AudioPlayerBar';
 import RecordCard from '@/components/RecordCard';
-import StoriesGroupedList from '@/components/stories/StoriesGroupedList';
+import StoriesGroupedList, {
+  type Story,
+} from '@/components/stories/StoriesGroupedList';
 import { api } from '@/convex/_generated/api';
 import type { Id } from '@/convex/_generated/dataModel';
 
@@ -15,10 +18,19 @@ export default function ParentHome() {
   const incrementPlays = useMutation(api.stories.incrementPlays);
 
   const [selectedDate] = useState<string | undefined>(undefined);
+  const [activeStory, setActiveStory] = useState<Story | null>(null);
+  const [showPlayer, setShowPlayer] = useState(false);
 
   const handlePlayStory = async (storyId: Id<'stories'>) => {
     try {
       await incrementPlays({ storyId });
+      const story = stories?.find((s: any) => s._id === storyId) as
+        | Story
+        | undefined;
+      if (story) {
+        setActiveStory(story);
+        setShowPlayer(true);
+      }
     } catch (error) {
       console.error('Failed to increment plays:', error);
     }
@@ -95,6 +107,13 @@ export default function ParentHome() {
             </section>
           </div>
         </main>
+        {showPlayer && (
+          <AudioPlayerBar
+            story={activeStory}
+            autoplay={true}
+            onClose={() => setShowPlayer(false)}
+          />
+        )}
       </div>
     </div>
   );

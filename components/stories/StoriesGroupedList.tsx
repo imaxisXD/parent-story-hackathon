@@ -15,6 +15,7 @@ export type Story = {
   duration: number;
   plays: number;
   rating: number;
+  audioUrl?: string;
   createdAt: number; // timestamp
 };
 
