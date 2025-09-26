@@ -19,10 +19,7 @@ export const vapiServerEvents = httpAction(async (ctx, request) => {
 
   const raw = body ?? {};
   const message = raw as Record<string, unknown>;
-  const type: string | undefined = message.type;
-
-  // Extract identifiers defensively from known locations
-  const call = message.call ?? {};
+  const type = message.type;
 
   if (type === 'end-of-call-report') {
     console.log('end-of-call-report', message.transcript);
@@ -49,7 +46,7 @@ export const vapiServerEvents = httpAction(async (ctx, request) => {
     JSON.stringify({ ok: true, handled: type === 'end-of-call-report', type }),
     {
       status: 200,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json' },
     }
   );
 });

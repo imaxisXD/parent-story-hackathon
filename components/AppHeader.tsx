@@ -48,7 +48,7 @@ export default function AppHeader({
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 px-4 pt-4 pb-2 backdrop-blur-sm ">
-      <div className="max-w-5xl mx-auto px-4 py-2 rounded-4xl border shadow-sm bg-slate-50/90">
+      <div className="max-w-5xl mx-auto px-4 py-2 rounded-4xl border border-white shadow-sm backdrop-blur-sm bg-black/80">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
@@ -57,14 +57,14 @@ export default function AppHeader({
                 alt="Kira"
                 width={64}
                 height={64}
-                className="object-cover rounded-md backdrop-blur-2xl"
+                className="object-cover rounded-full"
               />
 
               <div>
-                <h1 className="text-2xl font-black text-foreground tracking-tight">
+                <h1 className="text-2xl font-black tracking-tight text-white">
                   Kira
                 </h1>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-gray-300">
                   Make every day a little story
                 </p>
               </div>

@@ -89,7 +89,7 @@ export default function RecordCard() {
                 cardState === 'error'
               }
               className={cn(
-                'relative hover:scale-105 transition-all duration-300 w-[110px] h-[110px] border border-sky-400 rounded-full overflow-hidden focus:outline-none disabled:opacity-60 disabled:cursor-not-allowed',
+                'relative hover:scale-105 transition-all duration-300 w-[110px] h-[110px] rounded-full overflow-hidden focus:outline-none disabled:opacity-60 disabled:cursor-not-allowed',
                 cardState === 'connecting' && 'animate-pulse'
               )}
               type="button"

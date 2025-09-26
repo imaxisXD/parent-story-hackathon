@@ -1,16 +1,20 @@
 'use client';
 
 import { useMutation, useQuery } from 'convex/react';
+import dynamic from 'next/dynamic';
 import { useState } from 'react';
 import ActivityCalendar from '@/components/ActivityCalendar';
 import AppHeader from '@/components/AppHeader';
 import AudioPlayerBar from '@/components/AudioPlayerBar';
-import RecordCard from '@/components/RecordCard';
 import StoriesGroupedList, {
   type Story,
 } from '@/components/stories/StoriesGroupedList';
 import { api } from '@/convex/_generated/api';
 import type { Id } from '@/convex/_generated/dataModel';
+
+const RecordCard = dynamic(() => import('@/components/RecordCard'), {
+  ssr: false,
+});
 
 export default function ParentHome() {
   const stories = useQuery(api.stories.getStories);
