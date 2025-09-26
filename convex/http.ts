@@ -17,19 +17,12 @@ export const vapiServerEvents = httpAction(async (ctx, request) => {
     return new Response('Invalid JSON', { status: 400 });
   }
 
-  const raw =
-    (body as { message?: VapiMessageMinimal } | VapiMessageMinimal) ?? {};
-  const message: VapiMessageMinimal =
-    ((raw as Record<string, unknown>).message as VapiMessageMinimal) ??
-    (raw as VapiMessageMinimal);
+  const raw = body ?? {};
+  const message = raw as Record<string, unknown>;
   const type: string | undefined = message.type;
 
   // Extract identifiers defensively from known locations
   const call = message.call ?? {};
-  const callId: string = call.id || call.callId || message.callId || 'unknown';
-  const phoneNumber: string | undefined =
-    message.phoneNumber || call.phoneNumber;
-  const timestamp: number = Number(message.timestamp ?? Date.now());
 
   if (type === 'end-of-call-report') {
     console.log('end-of-call-report', message.transcript);
