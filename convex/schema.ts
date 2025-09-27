@@ -35,4 +35,14 @@ export default defineSchema({
   })
     .index('by_call', ['callId'])
     .index('by_timestamp', ['timestamp']),
+
+  users: defineTable({
+    name: v.string(),
+    email: v.string(),
+    identifier: v.any(),
+    usage: v.number(),
+  })
+    .index('by_identifier', ['identifier'])
+    .index('by_email', ['email'])
+    .index('by_name', ['name']),
 });

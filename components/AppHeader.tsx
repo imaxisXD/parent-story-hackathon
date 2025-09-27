@@ -1,20 +1,20 @@
 'use client';
 
 import { useQuery } from 'convex/react';
-import { Flame, Star } from 'lucide-react';
+import { Flame } from 'lucide-react';
 import Image from 'next/image';
 import { useMemo } from 'react';
 import { api } from '@/convex/_generated/api';
+import LevelProgress from './LevelProgress';
+import { UserAvatar } from './UserAvatar';
 
 export default function AppHeader({
-  storyCount: storyCountProp,
+  storyCount: _storyCount,
 }: {
   storyCount?: number;
 }) {
   const storyStats = useQuery(api.stories.getStoryStats);
   const activityData = useQuery(api.stories.getActivityData);
-
-  const storyCount = storyCountProp ?? storyStats?.totalStories ?? 0;
 
   const { streak, xp, level, progress } = useMemo(() => {
     // Build a set of active dates (YYYY-MM-DD) for quick lookups
@@ -47,8 +47,8 @@ export default function AppHeader({
   }, [activityData, storyStats]);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 px-4 pt-4 pb-2 backdrop-blur-sm ">
-      <div className="max-w-5xl mx-auto px-4 py-1 rounded-2xl border border-pink-400 shadow-sm bg-[#227effcc] backdrop-blur-sm">
+    <header className="fixed top-0 inset-x-0 z-50 px-4 pt-4 pb-2 backdrop-blur-sm">
+      <div className="max-w-5xl mx-auto px-4 py-1 rounded-2xl border border-pink-400 shadow-sm bg-[#ff22b8cc] backdrop-blur-sm">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
@@ -78,18 +78,8 @@ export default function AppHeader({
               </span>
             </div>
 
-            <div className="hidden md:flex items-center gap-2 rounded-full bg-white border border-border shadow-xs px-3 h-8 text-xs text-muted-foreground">
-              <Star className="h-3.5 w-3.5 text-yellow-500" />
-              <span>Lv {level}</span>
-              <div className="w-20 h-2 bg-muted rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-primary"
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
-              <span className="tabular-nums">{xp} XP</span>
-            </div>
-            {/* {clerk} */}
+            <LevelProgress level={level} progress={progress} xp={xp} />
+            <UserAvatar />
           </div>
         </div>
       </div>

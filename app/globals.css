@@ -165,6 +165,13 @@
   body { @apply text-foreground font-bricolage-grotesque overflow-x-hidden; }
 }
 
+/* Reserve space for vertical scrollbar to avoid layout shift when it appears */
+html { scrollbar-gutter: stable both-edges; }
+/* Fallback: force vertical scrollbar on desktop to keep layout width constant */
+@media (hover: hover) and (pointer: fine) {
+  body { overflow-y: scroll; }
+}
+
 /* Keyframes for playful motion */
 @keyframes float {
   0%, 100% { transform: translateY(0px); }

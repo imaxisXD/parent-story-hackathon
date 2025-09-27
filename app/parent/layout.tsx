@@ -1,7 +1,8 @@
 'use client';
-import { Authenticated, AuthLoading } from 'convex/react';
-
+import { Authenticated, AuthLoading, useMutation } from 'convex/react';
+import { useEffect } from 'react';
 import ParentPageSkeleton from '@/components/ParentPageSkeleton';
+import { api } from '@/convex/_generated/api';
 
 export default function ParentLayout({
   children,
@@ -11,6 +12,7 @@ export default function ParentLayout({
   return (
     <>
       <Authenticated>
+        <StoreUserInDatabase />
         <div className="min-h-screen w-full bg-white relative overflow-x-hidden">
           <div
             className="fixed inset-0 z-0 pointer-events-none"
@@ -46,15 +48,10 @@ export default function ParentLayout({
   );
 }
 
-// function redirectToSignIn() {
-//   const { isLoading, isAuthenticated } = useConvexAuth();
-//   if (isLoading) {
-//     console.log('isLoading', isLoading);
-//     return null;
-//   }
-//   // if (isAuthenticated) {
-//   //   redirect('/parent');
-//   // }
-//   redirect('/sign-in');
-//   return null;
-// }
+function StoreUserInDatabase() {
+  const storeUser = useMutation(api.auth.storeUser);
+  useEffect(() => {
+    void storeUser();
+  }, [storeUser]);
+  return null;
+}

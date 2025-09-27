@@ -125,7 +125,7 @@ export default function AudioPlayerBar({
   if (!story) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 pb-[env(safe-area-inset-bottom)]">
+    <div className="fixed bottom-0 inset-x-0 z-50 pb-[env(safe-area-inset-bottom)]">
       <div className="mx-auto max-w-4xl px-4">
         <div className="mb-3 rounded-2xl border border-border bg-white shadow-md">
           <div className="flex items-center gap-3 px-3 py-2">

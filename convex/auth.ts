@@ -3,7 +3,7 @@ import { convex } from '@convex-dev/better-auth/plugins';
 import { betterAuth } from 'better-auth';
 import { components } from './_generated/api';
 import type { DataModel } from './_generated/dataModel';
-import { query } from './_generated/server';
+import { mutation, query } from './_generated/server';
 
 const siteUrl = process.env.SITE_URL!;
 
@@ -16,8 +16,6 @@ export const createAuth = (
   { optionsOnly } = { optionsOnly: false }
 ) => {
   return betterAuth({
-    // disable logging when createAuth is called just to generate options.
-    // this is not required, but there's a lot of noise in logs without it.
     logger: {
       disabled: optionsOnly,
     },
@@ -34,11 +32,47 @@ export const createAuth = (
   });
 };
 
-// Example function for getting the current user
 // Feel free to edit, omit, etc.
 export const getCurrentUser = query({
   args: {},
   handler: async (ctx) => {
-    return authComponent.getAuthUser(ctx);
+    const userData = await authComponent.getAuthUser(ctx);
+    if (!userData) {
+      return null;
+    }
+    const user = await ctx.db
+      .query('users')
+      .withIndex('by_identifier', (q) => q.eq('identifier', userData._id))
+      .first();
+    return {
+      email: userData.email,
+      name: userData.name,
+      image: userData.image,
+      usage: user?.usage ?? 2,
+    };
+  },
+});
+
+export const storeUser = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const userFromBetterAuth = await authComponent.getAuthUser(ctx);
+    if (userFromBetterAuth) {
+      const user = await ctx.db
+        .query('users')
+        .withIndex('by_identifier', (q) =>
+          q.eq('identifier', userFromBetterAuth._id)
+        )
+        .first();
+      if (!user) {
+        //Insert new user
+        await ctx.db.insert('users', {
+          identifier: userFromBetterAuth._id,
+          name: userFromBetterAuth.name,
+          email: userFromBetterAuth.email,
+          usage: 2,
+        });
+      }
+    }
   },
 });
