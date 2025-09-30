@@ -1,7 +1,9 @@
 'use client';
 
 import Vapi from '@vapi-ai/web';
+import { useQuery } from 'convex/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { api } from '@/convex/_generated/api';
 import { suppressDeprecatedDailyWarnings } from '@/lib/utils';
 
 export type VapiStatus =
@@ -10,18 +12,24 @@ export type VapiStatus =
   | 'connected'
   | 'disconnecting';
 
-type VapiEventMessage = {
-  type?: string;
-  role?: 'user' | 'assistant' | string;
-  transcript?: string;
-  [key: string]: unknown;
-};
-
 export function useVapi() {
   const vapiRef = useRef<InstanceType<typeof Vapi> | null>(null);
+  const mediaStreamRef = useRef<MediaStream | null>(null);
   const [status, setStatus] = useState<VapiStatus>('disconnected');
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const user = useQuery(api.auth.getCurrentUser);
+
+  // Function to cleanup media stream
+  const cleanupMediaStream = useCallback(() => {
+    if (mediaStreamRef.current) {
+      mediaStreamRef.current.getTracks().forEach((track) => {
+        track.stop();
+      });
+      mediaStreamRef.current = null;
+    }
+  }, []);
 
   useEffect(() => {
     try {
@@ -32,8 +40,6 @@ export function useVapi() {
         );
       }
 
-      // Suppress the deprecated Daily.js version warning
-      // This is a temporary workaround for VAPI SDK still referencing old Daily.js version
       const cleanupSuppression = suppressDeprecatedDailyWarnings();
 
       const vapi = new Vapi(apiKey);
@@ -48,6 +54,7 @@ export function useVapi() {
       vapi.on('call-end', () => {
         setStatus('disconnected');
         setIsSpeaking(false);
+        cleanupMediaStream();
       });
 
       vapi.on('speech-start', () => {
@@ -58,20 +65,17 @@ export function useVapi() {
         setIsSpeaking(false);
       });
 
-      vapi.on('message', (message: VapiEventMessage) => {
-        console.log('Vapi message:', message);
-      });
-
       vapi.on('error', (error: unknown) => {
         console.warn('Vapi error:', error);
         setStatus('disconnected');
         setError(error instanceof Error ? error.message : String(error));
-        // Don't re-throw the error as it's already handled
+        cleanupMediaStream();
       });
 
       return () => {
         try {
           vapi?.stop?.();
+          cleanupMediaStream();
         } catch {}
       };
     } catch (error) {
@@ -79,7 +83,7 @@ export function useVapi() {
       setError(error instanceof Error ? error.message : String(error));
       setStatus('disconnected');
     }
-  }, []);
+  }, [cleanupMediaStream]);
 
   const start = useCallback(
     async (assistantIdParam?: string) => {
@@ -92,14 +96,17 @@ export function useVapi() {
       setStatus('connecting');
 
       try {
-        // Request microphone permissions
-        await navigator.mediaDevices.getUserMedia({ audio: true });
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+        });
+        mediaStreamRef.current = stream;
 
         const assistantId =
           assistantIdParam || process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID;
         const assistantOverrides = {
           variableValues: {
-            user_name: 'Angelo',
+            user_name: user?.name,
+            user_email: user?.email,
           },
         };
         try {
@@ -112,17 +119,15 @@ export function useVapi() {
               ? startError.message
               : String(startError)
           );
-          // Do not rethrow; swallow to avoid breaking the app
           return;
         }
       } catch (error) {
         console.warn('Failed to start VAPI call with Daily.co:', error);
         setStatus('disconnected');
         setError(error instanceof Error ? error.message : String(error));
-        // Don't re-throw the error as it's already handled in the component
       }
     },
-    [status]
+    [status, user?.email, user?.name]
   );
 
   const stop = useCallback(async () => {
@@ -131,11 +136,13 @@ export function useVapi() {
 
     try {
       vapiRef.current?.stop();
+      cleanupMediaStream();
     } catch (error) {
       console.error('Failed to stop VAPI call:', error);
       setError(error instanceof Error ? error.message : String(error));
+      cleanupMediaStream();
     }
-  }, [status]);
+  }, [status, cleanupMediaStream]);
 
   return { status, isSpeaking, error, start, stop } as const;
 }

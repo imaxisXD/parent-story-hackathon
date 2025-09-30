@@ -1,23 +1,63 @@
 import { v } from 'convex/values';
-import { mutation } from './_generated/server';
+import { internal } from './_generated/api';
+import { internalMutation } from './_generated/server';
+import { workflow } from './storyWorkflow';
 
-export const ingestEndOfCallReport = mutation({
+export const ingestEndOfCallReport = internalMutation({
   args: {
-    type: v.string(),
     callId: v.string(),
-    phoneNumber: v.optional(v.string()),
-    payload: v.any(),
-    timestamp: v.number(),
+    transcript: v.string(),
+    summary: v.string(),
+    timestamp: v.string(),
+    userEmail: v.string(),
+    userName: v.string(),
+    evaluation: v.string(),
   },
   handler: async (ctx, args) => {
-    const { type, callId, phoneNumber, payload, timestamp } = args;
-    const id = await ctx.db.insert('vapiReports', {
-      type,
-      callId,
-      phoneNumber,
-      payload,
-      timestamp,
+    const user = await ctx.db
+      .query('users')
+      .withIndex('by_email', (q) => q.eq('email', args.userEmail))
+      .first();
+
+    if (!user) {
+      return;
+    }
+
+    const evaluationBoolean = args.evaluation === 'true';
+
+    const reportId = await ctx.db.insert('vapiReports', {
+      callId: args.callId,
+      timestamp: args.timestamp,
+      userEmail: args.userEmail,
+      userName: args.userName,
+      evaluation: evaluationBoolean,
+      summary: args.summary,
+      transcript: args.transcript,
+      userId: user._id,
+      workflowStatus: evaluationBoolean ? 'pending' : 'skipped',
     });
-    return { id };
+
+    if (evaluationBoolean) {
+      await workflow.start(
+        ctx,
+        internal.storyWorkflow.generateStoryFromTranscript,
+        { reportId }
+      );
+    }
+
+    return { reportId, workflowTriggered: evaluationBoolean };
+  },
+});
+
+export const startWorkflow = internalMutation({
+  args: {
+    reportId: v.id('vapiReports'),
+  },
+  handler: async (ctx, { reportId }) => {
+    await workflow.start(
+      ctx,
+      internal.storyWorkflow.generateStoryFromTranscript,
+      { reportId }
+    );
   },
 });

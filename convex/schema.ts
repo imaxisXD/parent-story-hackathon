@@ -27,14 +27,22 @@ export default defineSchema({
     .index('by_user_date', ['userId', 'date']),
 
   vapiReports: defineTable({
-    type: v.string(), // Vapi message.type, e.g., "end-of-call-report"
-    callId: v.string(), // Call identifier if available
-    phoneNumber: v.optional(v.string()), // phone number if present
-    timestamp: v.number(), // time stored (ms)
-    payload: v.any(), // full webhook payload for auditing/debugging
+    callId: v.string(),
+    timestamp: v.string(),
+    userEmail: v.string(),
+    userName: v.string(),
+    evaluation: v.boolean(),
+    summary: v.string(),
+    transcript: v.string(),
+    userId: v.id('users'),
+    storyText: v.optional(v.string()),
+    audioStorageId: v.optional(v.id('_storage')),
+    workflowStatus: v.optional(v.string()), // 'pending', 'processing', 'completed', 'failed'
+    workflowError: v.optional(v.string()),
   })
     .index('by_call', ['callId'])
-    .index('by_timestamp', ['timestamp']),
+    .index('by_email', ['userEmail'])
+    .index('by_user', ['userId']),
 
   users: defineTable({
     name: v.string(),

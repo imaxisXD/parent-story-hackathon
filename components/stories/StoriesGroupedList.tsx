@@ -1,26 +1,32 @@
 'use client';
 
-import { Play, Star } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { Play } from 'lucide-react';
+import { useMemo, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import type { Id } from '@/convex/_generated/dataModel';
 import { cn } from '@/lib/utils';
 
-export type Story = {
-  _id: Id<'stories'>;
-  emoji: string;
-  title: string;
-  characterName: string;
-  duration: number;
-  plays: number;
-  rating: number;
-  audioUrl?: string;
-  createdAt: number; // timestamp
-};
-
 export type StoriesView = 'grid' | 'list';
-export type StoriesSort = 'recent' | 'mostPlayed' | 'highestRated' | 'longest';
+export type StoriesSort = 'recent' | 'longest';
+
+export type Story = {
+  _id: Id<'vapiReports'>;
+  _creationTime: number;
+  callId: string;
+  timestamp: string;
+  userEmail: string;
+  userName: string;
+  evaluation: boolean;
+  summary: string;
+  transcript: string;
+  userId: Id<'users'>;
+  storyText?: string;
+  audioStorageId?: Id<'_storage'>;
+  audioUrl?: string | null;
+  workflowStatus?: string;
+  workflowError?: string;
+};
 
 function isToday(ts: number) {
   const d = new Date(ts);
@@ -79,47 +85,37 @@ export default function StoriesGroupedList({
   sort: StoriesSort;
   search: string;
   selectedDate?: string;
-  onPlay: (id: Id<'stories'>) => void;
+  onPlay: (id: Id<'vapiReports'>) => void;
 }) {
-  const [showMonths, setShowMonths] = useState<number>(3); // reveal more on demand
-  const [favorites, setFavorites] = useState<Record<string, boolean>>(() => {
-    if (typeof window === 'undefined') return {};
-    try {
-      const raw = localStorage.getItem('ps:favorites');
-      return raw ? JSON.parse(raw) : {};
-    } catch {
-      return {};
-    }
-  });
-
-  useEffect(() => {
-    try {
-      localStorage.setItem('ps:favorites', JSON.stringify(favorites));
-    } catch {}
-  }, [favorites]);
+  const [showMonths, setShowMonths] = useState<number>(3);
 
   const filteredSorted = useMemo(() => {
     const term = search.trim().toLowerCase();
     const arr = stories.filter((s) => {
+      if (s.workflowStatus !== 'completed' || !s.audioStorageId) return false;
+
       const matchesText = term
-        ? s.title.toLowerCase().includes(term) ||
-          s.characterName.toLowerCase().includes(term)
+        ? s.storyText?.toLowerCase().includes(term) ||
+          s.summary.toLowerCase().includes(term) ||
+          s.userName.toLowerCase().includes(term)
         : true;
       const matchesDate = selectedDate
-        ? new Date(s.createdAt).toISOString().split('T')[0] === selectedDate
+        ? new Date(Number(s.timestamp)).toISOString().split('T')[0] ===
+          selectedDate
         : true;
       return matchesText && matchesDate;
     });
     arr.sort((a, b) => {
+      const aTime = Number(a.timestamp);
+      const bTime = Number(b.timestamp);
       switch (sort) {
-        case 'mostPlayed':
-          return b.plays - a.plays;
-        case 'highestRated':
-          return b.rating - a.rating;
-        case 'longest':
-          return b.duration - a.duration;
+        case 'longest': {
+          const aDuration = (a.storyText?.length || 0) / 20; // ~20 chars per second
+          const bDuration = (b.storyText?.length || 0) / 20;
+          return bDuration - aDuration;
+        }
         default:
-          return b.createdAt - a.createdAt;
+          return bTime - aTime;
       }
     });
     return arr;
@@ -131,10 +127,11 @@ export default function StoriesGroupedList({
     const byMonth = new Map<string, Story[]>();
 
     for (const s of filteredSorted) {
-      if (isToday(s.createdAt)) today.push(s);
-      else if (isThisWeek(s.createdAt)) week.push(s);
+      const timestamp = Number(s.timestamp);
+      if (isToday(timestamp)) today.push(s);
+      else if (isThisWeek(timestamp)) week.push(s);
       else {
-        const key = monthKey(s.createdAt);
+        const key = monthKey(timestamp);
         if (!byMonth.has(key)) byMonth.set(key, []);
         const list = byMonth.get(key);
         if (list) list.push(s);
@@ -156,18 +153,39 @@ export default function StoriesGroupedList({
   const storyOfTheDay = useMemo(() => {
     if (!selectedDate && (groups.today?.length ?? 0) > 0) {
       return [...groups.today].sort(
-        (a, b) => b.rating - a.rating || b.plays - a.plays
+        (a, b) => (b.storyText?.length || 0) - (a.storyText?.length || 0)
       )[0];
     }
     return undefined;
   }, [groups.today, selectedDate]);
 
-  function toggleFav(id?: string) {
-    if (!id) return;
-    setFavorites((prev) => ({ ...prev, [id]: !prev[id] }));
+  function getStoryTitle(story: Story): string {
+    if (story.storyText) {
+      const firstSentence = story.storyText.split(/[.!?]/)[0];
+      return firstSentence.length > 60
+        ? firstSentence.substring(0, 60) + '...'
+        : firstSentence;
+    }
+    return story.summary.length > 60
+      ? story.summary.substring(0, 60) + '...'
+      : story.summary;
+  }
+
+  function getEmoji(story: Story): string {
+    const emojiMatch = story.storyText?.match(/[\p{Emoji}]/u);
+    return emojiMatch ? emojiMatch[0] : '📖';
+  }
+
+  function getDuration(story: Story): number {
+    const wordCount = story.storyText?.split(/\s+/).length || 0;
+    return Math.ceil((wordCount / 150) * 60); // Convert to seconds
   }
 
   function Card({ s, highlight }: { s: Story; highlight?: boolean }) {
+    const title = getStoryTitle(s);
+    const emoji = getEmoji(s);
+    const duration = getDuration(s);
+
     return (
       <div
         className={cn(
@@ -177,25 +195,13 @@ export default function StoriesGroupedList({
       >
         <div className="absolute -top-6 -right-6 size-16 rounded-full bg-pink-200/40 blur-2xl" />
         <div className="flex items-start gap-3">
-          <div className="text-2xl leading-none">{s.emoji}</div>
-          <div className="min-w-0">
-            <div className="font-medium truncate">{s.title}</div>
+          <div className="text-2xl leading-none">{emoji}</div>
+          <div className="min-w-0 flex-1">
+            <div className="font-medium truncate">{title}</div>
             <div className="mt-1 flex items-center gap-2">
               <Badge variant="secondary" className="text-[10px] rounded-full">
-                {s.characterName}
+                {s.userName}
               </Badge>
-              <button
-                type="button"
-                onClick={() => toggleFav(s._id as string)}
-                className={cn(
-                  'text-xs px-2 h-6 rounded-full border',
-                  favorites[s._id as string]
-                    ? 'border-primary text-primary bg-primary/10'
-                    : 'border-border text-muted-foreground bg-white'
-                )}
-              >
-                {favorites[s._id as string] ? '★ Favorite' : '☆ Favorite'}
-              </button>
               {highlight && (
                 <span className="text-[10px] px-2 h-6 inline-flex items-center rounded-full bg-fun-yellow/30 border border-yellow-300/70">
                   Story of the Day
@@ -206,19 +212,9 @@ export default function StoriesGroupedList({
         </div>
         <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
           <div className="flex items-center gap-3">
-            <span>{formatDuration(s.duration)}</span>
-            <span>•</span>
-
-            <span className="flex items-center gap-1">
-              {Array.from({ length: s.rating }).map((_, starIndex) => (
-                <Star
-                  key={`${s._id || s.title}-star-${starIndex}`}
-                  className="h-3 w-3 text-yellow-500 fill-current"
-                />
-              ))}
-            </span>
+            <span>{formatDuration(duration)}</span>
           </div>
-          <span>{formatRelative(s.createdAt)}</span>
+          <span>{formatRelative(Number(s.timestamp))}</span>
         </div>
         <div className="absolute bottom-3 right-3">
           <Button
@@ -226,7 +222,7 @@ export default function StoriesGroupedList({
             size="icon"
             className="rounded-full shadow-sm"
             onClick={() => onPlay(s._id)}
-            aria-label={`Play ${s.title}`}
+            aria-label={`Play ${title}`}
           >
             <Play className="h-4 w-4" />
           </Button>
@@ -236,6 +232,10 @@ export default function StoriesGroupedList({
   }
 
   function Row({ s, highlight }: { s: Story; highlight?: boolean }) {
+    const title = getStoryTitle(s);
+    const emoji = getEmoji(s);
+    const duration = getDuration(s);
+
     return (
       <div
         className={cn(
@@ -243,16 +243,16 @@ export default function StoriesGroupedList({
           highlight && 'ring-2 ring-primary/40'
         )}
       >
-        <div className="text-xl w-7 text-center">🦸🏻</div>
+        <div className="text-xl w-7 text-center">{emoji}</div>
         <div className="flex-1 min-w-0">
-          <div className="font-medium truncate">{s.title}</div>
+          <div className="font-medium truncate">{title}</div>
           <div className="text-xs text-muted-foreground truncate">
-            Duration {formatDuration(s.duration)}
+            Duration {formatDuration(duration)}
           </div>
         </div>
 
         <div className="text-xs text-muted-foreground w-24 text-right">
-          {formatRelative(s.createdAt)}
+          {formatRelative(Number(s.timestamp))}
         </div>
         <Button
           variant="default"
@@ -275,21 +275,13 @@ export default function StoriesGroupedList({
       ) : view === 'grid' ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {groups.today.map((s) => (
-            <Card
-              key={s._id || s.title}
-              s={s}
-              highlight={storyOfTheDay?._id === s._id}
-            />
+            <Card key={s._id} s={s} highlight={storyOfTheDay?._id === s._id} />
           ))}
         </div>
       ) : (
         <div className="space-y-2">
           {groups.today.map((s) => (
-            <Row
-              key={s._id || s.title}
-              s={s}
-              highlight={storyOfTheDay?._id === s._id}
-            />
+            <Row key={s._id} s={s} highlight={storyOfTheDay?._id === s._id} />
           ))}
         </div>
       )}
@@ -302,13 +294,13 @@ export default function StoriesGroupedList({
         (view === 'grid' ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {groups.week.map((s) => (
-              <Card key={s._id || s.title} s={s} />
+              <Card key={s._id} s={s} />
             ))}
           </div>
         ) : (
           <div className="space-y-2">
             {groups.week.map((s) => (
-              <Row key={s._id || s.title} s={s} />
+              <Row key={s._id} s={s} />
             ))}
           </div>
         ))}
@@ -320,13 +312,13 @@ export default function StoriesGroupedList({
           {view === 'grid' ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {items.map((s) => (
-                <Card key={s._id || s.title} s={s} />
+                <Card key={s._id} s={s} />
               ))}
             </div>
           ) : (
             <div className="space-y-2">
               {items.map((s) => (
-                <Row key={s._id || s.title} s={s} />
+                <Row key={s._id} s={s} />
               ))}
             </div>
           )}
@@ -359,6 +351,7 @@ function GroupHeader({ title, count }: { title: string; count: number }) {
   );
 }
 function MonthHeader({ label, count }: { label: string; count: number }) {
+  console.log('MonthHeader', label, count);
   return (
     <div className="sticky top-10 z-10 -mx-2 px-2 py-1.5 bg-gradient-to-b from-white/90 to-white/70 backdrop-blur supports-[backdrop-filter]:bg-white/60 rounded">
       <div className="flex items-center gap-2">

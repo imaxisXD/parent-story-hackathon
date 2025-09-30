@@ -1,6 +1,6 @@
 'use client';
 
-import { useMutation, useQuery } from 'convex/react';
+import { useQuery } from 'convex/react';
 import dynamic from 'next/dynamic';
 
 import { useState } from 'react';
@@ -19,31 +19,22 @@ const RecordCard = dynamic(() => import('@/components/RecordCard'), {
 
 export default function ParentHome() {
   const stories = useQuery(api.stories.getStories);
-  const storyStats = useQuery(api.stories.getStoryStats);
-  const incrementPlays = useMutation(api.stories.incrementPlays);
 
   const [selectedDate] = useState<string | undefined>(undefined);
   const [activeStory, setActiveStory] = useState<Story | null>(null);
   const [showPlayer, setShowPlayer] = useState(false);
 
-  const handlePlayStory = async (storyId: Id<'stories'>) => {
-    try {
-      await incrementPlays({ storyId });
-      const story = stories?.find((s: any) => s._id === storyId) as
-        | Story
-        | undefined;
-      if (story) {
-        setActiveStory(story);
-        setShowPlayer(true);
-      }
-    } catch (error) {
-      console.error('Failed to increment plays:', error);
+  const handlePlayStory = async (storyId: Id<'vapiReports'>) => {
+    const story = stories?.find((s) => s._id === storyId);
+    if (story) {
+      setActiveStory(story);
+      setShowPlayer(true);
     }
   };
 
   return (
     <div className="relative z-10">
-      <AppHeader storyCount={storyStats?.totalStories ?? 0} />
+      <AppHeader storyCount={stories?.length ?? 0} />
       <main className="mx-auto max-w-4xl px-6 py-34">
         <div className="space-y-12">
           <section className="space-y-4">

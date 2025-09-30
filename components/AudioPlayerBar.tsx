@@ -124,18 +124,45 @@ export default function AudioPlayerBar({
 
   if (!story) return null;
 
+  // Helper functions to extract display info from story
+  const getStoryTitle = (s: Story): string => {
+    if (s.storyText) {
+      const firstSentence = s.storyText.split(/[.!?]/)[0];
+      return firstSentence.length > 60
+        ? firstSentence.substring(0, 60) + '...'
+        : firstSentence;
+    }
+    return s.summary.length > 60
+      ? s.summary.substring(0, 60) + '...'
+      : s.summary;
+  };
+
+  const getEmoji = (s: Story): string => {
+    const emojiMatch = s.storyText?.match(/[\p{Emoji}]/u);
+    return emojiMatch ? emojiMatch[0] : '📖';
+  };
+
+  const getDuration = (s: Story): number => {
+    const wordCount = s.storyText?.split(/\s+/).length || 0;
+    return Math.ceil((wordCount / 150) * 60);
+  };
+
+  const title = story ? getStoryTitle(story) : '';
+  const emoji = story ? getEmoji(story) : '';
+  const estimatedDuration = story ? getDuration(story) : 0;
+
   return (
     <div className="fixed bottom-0 inset-x-0 z-50 pb-[env(safe-area-inset-bottom)]">
       <div className="mx-auto max-w-4xl px-4">
         <div className="mb-3 rounded-2xl border border-border bg-white shadow-md">
           <div className="flex items-center gap-3 px-3 py-2">
-            <div className="text-xl select-none">{story.emoji}</div>
+            <div className="text-xl select-none">{emoji}</div>
             <div className="min-w-0 flex-1">
-              <div className="truncate text-sm font-medium">{story.title}</div>
+              <div className="truncate text-sm font-medium">{title}</div>
               <div className="mt-1 flex items-center gap-2">
                 <span className="text-[11px] text-muted-foreground">
                   {formatTime(current)} /{' '}
-                  {formatTime(duration || story.duration || 0)}
+                  {formatTime(duration || estimatedDuration)}
                 </span>
               </div>
             </div>
@@ -188,7 +215,7 @@ export default function AudioPlayerBar({
                 aria-label="Seek"
               />
               <span className="w-10 text-[11px] tabular-nums text-muted-foreground text-right">
-                {formatTime(duration || story.duration || 0)}
+                {formatTime(duration || estimatedDuration)}
               </span>
             </div>
           </div>
@@ -199,7 +226,7 @@ export default function AudioPlayerBar({
             aria-label="Story audio playback"
           >
             {/* Providing an empty captions track to satisfy a11y rule; narrative audio has no dialog */}
-            <track kind="captions" src="" label="captions" default />
+            <track kind="captions" label="No captions available" />
           </audio>
           {!canPlay && (
             <div className="px-3 pb-3 text-[11px] text-muted-foreground">

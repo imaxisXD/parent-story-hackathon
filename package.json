@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@convex-dev/better-auth": "^0.8.6",
+    "@convex-dev/workflow": "^0.2.6",
     "@daily-co/daily-js": "^0.84.0",
     "@paper-design/shaders-react": "^0.0.46",
     "@radix-ui/react-avatar": "^1.1.10",
@@ -26,6 +27,7 @@
     "convex": "^1.27.3",
     "lucide-react": "^0.541.0",
     "next": "15.5.4",
+    "openai": "^5.23.1",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "tailwind-merge": "^3.3.1"
