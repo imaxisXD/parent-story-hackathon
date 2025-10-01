@@ -70,7 +70,7 @@ export const storeUser = mutation({
           identifier: userFromBetterAuth._id,
           name: userFromBetterAuth.name,
           email: userFromBetterAuth.email,
-          usage: 2,
+          usage: 6,
         });
       }
     }

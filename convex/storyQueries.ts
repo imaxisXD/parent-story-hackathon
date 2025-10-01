@@ -21,11 +21,7 @@ export const updateWorkflowStatus = internalMutation({
     const story = await ctx.db.get(reportId);
     if (story) {
       const user = await ctx.db.get(story.userId);
-      if (user) {
-        await ctx.db.patch(user._id, {
-          usage: user.usage - 1,
-        });
-      }
+
       await ctx.db.patch(story._id, {
         audioStorageId,
         workflowStatus: status,
@@ -34,6 +30,11 @@ export const updateWorkflowStatus = internalMutation({
 
       // When story workflow completes, notify the user via email
       if (status === 'completed' && user?.email) {
+        if (user) {
+          await ctx.db.patch(user._id, {
+            usage: user.usage - 1,
+          });
+        }
         // Construct an app URL for listening. Adjust if custom route.
         await ctx.scheduler.runAfter(
           0,

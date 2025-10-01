@@ -89,7 +89,6 @@ export const generateStoryFromTranscript = workflow.define({
       return { success: false, reason: 'audio_generation_failed' };
     }
 
-    // Step 7: Mark workflow as completed
     await step.runMutation(internal.storyQueries.updateWorkflowStatus, {
       reportId,
       status: 'completed',
