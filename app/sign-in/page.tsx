@@ -18,12 +18,6 @@ export default function SignIn() {
     await authClient.signIn.social(
       { provider: 'github' },
       {
-        onRequest: (e) => {
-          console.log('request', e);
-        },
-        onResponse: (e) => {
-          console.log('response', e);
-        },
         onError: (ctx) => {
           console.log(ctx);
           alert(ctx.error.message);
