@@ -2,11 +2,11 @@
 
 import { useQuery } from 'convex/react';
 import dynamic from 'next/dynamic';
-
 import { useState } from 'react';
 import ActivityCalendar from '@/components/ActivityCalendar';
 import AppHeader from '@/components/AppHeader';
 import AudioPlayerBar from '@/components/AudioPlayerBar';
+import ParentPageSkeleton from '@/components/ParentPageSkeleton';
 import StoriesGroupedList, {
   type Story,
 } from '@/components/stories/StoriesGroupedList';
@@ -19,10 +19,13 @@ const RecordCard = dynamic(() => import('@/components/RecordCard'), {
 
 export default function ParentHome() {
   const stories = useQuery(api.stories.getStories);
-
   const [selectedDate] = useState<string | undefined>(undefined);
   const [activeStory, setActiveStory] = useState<Story | null>(null);
   const [showPlayer, setShowPlayer] = useState(false);
+
+  if (stories === undefined) {
+    return <ParentPageSkeleton />;
+  }
 
   const handlePlayStory = async (storyId: Id<'vapiReports'>) => {
     const story = stories?.find((s) => s._id === storyId);

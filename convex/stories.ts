@@ -4,18 +4,18 @@ export const getStories = query({
   handler: async (ctx) => {
     const authenticatedUser = await ctx.auth.getUserIdentity();
     if (!authenticatedUser) {
-      throw new Error('User not authenticated');
+      return [];
     }
     const email = authenticatedUser.email;
     if (!email) {
-      throw new Error('User email not found');
+      return [];
     }
     const user = await ctx.db
       .query('users')
       .withIndex('by_email', (q) => q.eq('email', email))
       .first();
     if (!user) {
-      throw new Error('User not found');
+      return [];
     }
 
     const reports = await ctx.db
