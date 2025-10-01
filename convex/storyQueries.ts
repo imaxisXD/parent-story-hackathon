@@ -1,4 +1,5 @@
 import { v } from 'convex/values';
+import { internal } from './_generated/api';
 import type { Doc } from './_generated/dataModel';
 import { internalMutation, internalQuery } from './_generated/server';
 
@@ -30,6 +31,19 @@ export const updateWorkflowStatus = internalMutation({
         workflowStatus: status,
         ...(error && { workflowError: error }),
       });
+
+      // When story workflow completes, notify the user via email
+      if (status === 'completed' && user?.email) {
+        // Construct an app URL for listening. Adjust if custom route.
+        await ctx.scheduler.runAfter(
+          0,
+          internal.sendEmails.sendStoryCreatedEmail,
+          {
+            to: user.email,
+            userName: story.userName || 'there',
+          }
+        );
+      }
     }
   },
 });

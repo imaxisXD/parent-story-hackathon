@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@convex-dev/better-auth": "^0.8.6",
+    "@convex-dev/resend": "^0.1.13",
     "@convex-dev/workflow": "^0.2.6",
     "@daily-co/daily-js": "^0.84.0",
     "@paper-design/shaders-react": "^0.0.46",

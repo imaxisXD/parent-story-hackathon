@@ -1,6 +1,5 @@
 import { query } from './_generated/server';
 
-// Query to get all vapiReports with audio URLs for the authenticated user
 export const getStories = query({
   handler: async (ctx) => {
     const authenticatedUser = await ctx.auth.getUserIdentity();
