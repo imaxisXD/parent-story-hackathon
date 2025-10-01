@@ -18,7 +18,6 @@ export default function SignIn() {
     await authClient.signIn.social(
       {
         provider: 'github',
-        callbackURL: `${process.env.SITE_URL}/parent`,
       },
       {
         onError: (ctx) => {
