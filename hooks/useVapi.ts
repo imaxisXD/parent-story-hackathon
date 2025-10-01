@@ -68,7 +68,45 @@ export function useVapi() {
       vapi.on('error', (error: unknown) => {
         console.warn('Vapi error:', error);
         setStatus('disconnected');
-        setError(error instanceof Error ? error.message : String(error));
+
+        try {
+          if (error instanceof Error) {
+            setError(error.message);
+          } else if (typeof error === 'object' && error !== null) {
+            const errObj = error as Record<string, unknown> & {
+              error?: { type?: string; msg?: string; message?: string };
+              errorMsg?: string;
+              message?: string;
+            };
+
+            const message =
+              errObj.errorMsg ||
+              errObj.message ||
+              errObj.error?.msg ||
+              errObj.error?.message ||
+              'Unknown error';
+
+            setError(String(message));
+
+            if (
+              (errObj.error?.type === 'ejected' ||
+                errObj.error?.type === 'ended') &&
+              typeof message === 'string' &&
+              message.toLowerCase().includes('meeting has ended')
+            ) {
+              cleanupMediaStream();
+              if (typeof window !== 'undefined') {
+                window.location.reload();
+              }
+              return;
+            }
+          } else {
+            setError(String(error));
+          }
+        } catch {
+          setError('An unknown error occurred');
+        }
+
         cleanupMediaStream();
       });
 
@@ -93,6 +131,25 @@ export function useVapi() {
         status === 'disconnecting'
       )
         return;
+
+      // Gate on user usage before attempting to start
+      if (user === undefined) {
+        // Still loading user
+        setError('Loading your account details. Please try again.');
+        setStatus('disconnected');
+        return;
+      }
+      if (!user) {
+        setError('Please sign in to start a call.');
+        setStatus('disconnected');
+        return;
+      }
+      if (typeof user.usage === 'number' && user.usage <= 0) {
+        setError('You have no usage left.');
+        setStatus('disconnected');
+        return;
+      }
+
       setStatus('connecting');
 
       try {
@@ -127,7 +184,7 @@ export function useVapi() {
         setError(error instanceof Error ? error.message : String(error));
       }
     },
-    [status, user?.email, user?.name]
+    [status, user, user?.email, user?.name]
   );
 
   const stop = useCallback(async () => {
@@ -144,7 +201,14 @@ export function useVapi() {
     }
   }, [status, cleanupMediaStream]);
 
-  return { status, isSpeaking, error, start, stop } as const;
+  return {
+    status,
+    isSpeaking,
+    error,
+    start,
+    stop,
+    remainingUsage: user?.usage,
+  } as const;
 }
 
 export default useVapi;

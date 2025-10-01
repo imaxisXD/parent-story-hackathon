@@ -9,20 +9,20 @@ export const generateStoryFromLLM = internalAction({
     transcript: v.string(),
     userName: v.string(),
   },
-  handler: async (_, { transcript, userName }) => {
+  handler: async (_, { transcript }) => {
     try {
       const openai = new OpenAI({
         apiKey: process.env.OPENAI_API_KEY,
       });
 
-      const systemPrompt = `You are a creative children's story writer. Your task is to transform a conversation transcript between a parent and child into a captivating, age-appropriate story.
+      const systemPrompt = `You are a creative children's story writer. Your task is to transform a conversation transcript between a parent and Kira(the AI journal of the parent) into a captivating, age-appropriate story.
 
 Guidelines:
-- Create a story suitable for children aged 4-8
+- Create a story suitable for children aged 4-8 or choose age from the transcript.
+- Use simpler language and shorter sentences.
 - Include dialogue and descriptive language
 - Make it engaging and educational
 - Keep it between 300-500 words
-- Use the child's name (${userName}) as the protagonist
 - Incorporate elements from the conversation naturally
 - End with a positive message or lesson`;
 

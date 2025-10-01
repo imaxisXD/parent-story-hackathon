@@ -1,6 +1,6 @@
 'use client';
 
-import { Play } from 'lucide-react';
+import { Loader2, Play } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -92,7 +92,13 @@ export default function StoriesGroupedList({
   const filteredSorted = useMemo(() => {
     const term = search.trim().toLowerCase();
     const arr = stories.filter((s) => {
-      if (s.workflowStatus !== 'completed' || !s.audioStorageId) return false;
+      // Show completed stories OR work-in-progress stories (evaluation=true and pending/processing)
+      const isCompleted = s.workflowStatus === 'completed' && s.audioStorageId;
+      const isWorkInProgress =
+        s.evaluation &&
+        (s.workflowStatus === 'pending' || s.workflowStatus === 'processing');
+
+      if (!isCompleted && !isWorkInProgress) return false;
 
       const matchesText = term
         ? s.storyText?.toLowerCase().includes(term) ||
@@ -185,12 +191,15 @@ export default function StoriesGroupedList({
     const title = getStoryTitle(s);
     const emoji = getEmoji(s);
     const duration = getDuration(s);
+    const isWorkInProgress =
+      s.workflowStatus === 'pending' || s.workflowStatus === 'processing';
 
     return (
       <div
         className={cn(
           'group relative rounded-2xl border border-border bg-card p-4 shadow-xs hover:shadow-md hover-lift overflow-hidden',
-          highlight && 'ring-2 ring-primary/40'
+          highlight && 'ring-2 ring-primary/40',
+          isWorkInProgress && 'opacity-75'
         )}
       >
         <div className="absolute -top-6 -right-6 size-16 rounded-full bg-pink-200/40 blur-2xl" />
@@ -207,26 +216,39 @@ export default function StoriesGroupedList({
                   Story of the Day
                 </span>
               )}
+              {isWorkInProgress && (
+                <span className="text-[10px] px-2 h-6 inline-flex items-center gap-1 rounded-full bg-blue-100/80 border border-blue-300/70 text-blue-700">
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                  Creating story...
+                </span>
+              )}
             </div>
           </div>
         </div>
         <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
           <div className="flex items-center gap-3">
-            <span>{formatDuration(duration)}</span>
+            {!isWorkInProgress && <span>{formatDuration(duration)}</span>}
+            {isWorkInProgress && (
+              <span className="text-blue-600 font-medium">
+                {s.workflowStatus === 'pending' ? 'Queued' : 'Processing'}
+              </span>
+            )}
           </div>
           <span>{formatRelative(Number(s.timestamp))}</span>
         </div>
-        <div className="absolute bottom-3 right-3">
-          <Button
-            variant="default"
-            size="icon"
-            className="rounded-full shadow-sm"
-            onClick={() => onPlay(s._id)}
-            aria-label={`Play ${title}`}
-          >
-            <Play className="h-4 w-4" />
-          </Button>
-        </div>
+        {!isWorkInProgress && (
+          <div className="absolute bottom-3 right-3">
+            <Button
+              variant="default"
+              size="icon"
+              className="rounded-full shadow-sm"
+              onClick={() => onPlay(s._id)}
+              aria-label={`Play ${title}`}
+            >
+              <Play className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
       </div>
     );
   }
@@ -235,33 +257,51 @@ export default function StoriesGroupedList({
     const title = getStoryTitle(s);
     const emoji = getEmoji(s);
     const duration = getDuration(s);
+    const isWorkInProgress =
+      s.workflowStatus === 'pending' || s.workflowStatus === 'processing';
 
     return (
       <div
         className={cn(
           'flex items-center gap-3 p-3 rounded-xl border border-border bg-card hover-lift',
-          highlight && 'ring-2 ring-primary/40'
+          highlight && 'ring-2 ring-primary/40',
+          isWorkInProgress && 'opacity-75'
         )}
       >
         <div className="text-xl w-7 text-center">{emoji}</div>
         <div className="flex-1 min-w-0">
-          <div className="font-medium truncate">{title}</div>
+          <div className="font-medium truncate flex items-center gap-2">
+            {title}
+            {isWorkInProgress && (
+              <span className="text-[10px] px-2 py-1 inline-flex items-center gap-1 rounded-full bg-blue-100/80 border border-blue-300/70 text-blue-700">
+                <Loader2 className="h-3 w-3 animate-spin" />
+                Creating...
+              </span>
+            )}
+          </div>
           <div className="text-xs text-muted-foreground truncate">
-            Duration {formatDuration(duration)}
+            {isWorkInProgress
+              ? `${s.workflowStatus === 'pending' ? 'Queued' : 'Processing'}`
+              : `Duration ${formatDuration(duration)}`}
           </div>
         </div>
 
         <div className="text-xs text-muted-foreground w-24 text-right">
           {formatRelative(Number(s.timestamp))}
         </div>
-        <Button
-          variant="default"
-          size="icon"
-          className="rounded-full"
-          onClick={() => onPlay(s._id)}
-        >
-          <Play className="h-4 w-4" />
-        </Button>
+        {!isWorkInProgress && (
+          <Button
+            variant="default"
+            size="icon"
+            className="rounded-full"
+            onClick={() => onPlay(s._id)}
+          >
+            <Play className="h-4 w-4" />
+          </Button>
+        )}
+        {isWorkInProgress && (
+          <div className="w-10 h-10" /> // Placeholder to maintain alignment
+        )}
       </div>
     );
   }

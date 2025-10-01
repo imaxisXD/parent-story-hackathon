@@ -5,7 +5,7 @@ import { Flame } from 'lucide-react';
 import Image from 'next/image';
 import { useMemo } from 'react';
 import { api } from '@/convex/_generated/api';
-import LevelProgress from './LevelProgress';
+// import LevelProgress from './LevelProgress';
 import { UserAvatar } from './UserAvatar';
 
 export default function AppHeader({
@@ -78,7 +78,7 @@ export default function AppHeader({
               </span>
             </div>
 
-            <LevelProgress level={level} progress={progress} xp={xp} />
+            {/* <LevelProgress level={level} progress={progress} xp={xp} /> */}
             <UserAvatar />
           </div>
         </div>

@@ -17,11 +17,20 @@ export const updateWorkflowStatus = internalMutation({
     audioStorageId: v.optional(v.id('_storage')),
   },
   handler: async (ctx, { reportId, status, error, audioStorageId }) => {
-    await ctx.db.patch(reportId, {
-      audioStorageId,
-      workflowStatus: status,
-      ...(error && { workflowError: error }),
-    });
+    const story = await ctx.db.get(reportId);
+    if (story) {
+      const user = await ctx.db.get(story.userId);
+      if (user) {
+        await ctx.db.patch(user._id, {
+          usage: user.usage - 1,
+        });
+      }
+      await ctx.db.patch(story._id, {
+        audioStorageId,
+        workflowStatus: status,
+        ...(error && { workflowError: error }),
+      });
+    }
   },
 });
 
