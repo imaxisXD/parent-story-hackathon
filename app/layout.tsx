@@ -9,7 +9,7 @@ const bricolageGrotesque = Bricolage_Grotesque({
 });
 
 export const metadata: Metadata = {
-  title: 'Parent Story — Voice journaling into bedtime stories',
+  title: 'Kira App — Voice journaling into bedtime stories',
   description:
     'Speak about your day and transform moments into gentle bedtime stories.',
 };
