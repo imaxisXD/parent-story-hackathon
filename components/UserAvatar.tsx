@@ -2,6 +2,7 @@
 
 import { useQuery } from 'convex/react';
 import { ChevronsUpDown, LogOut, Sparkles } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
@@ -13,9 +14,11 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { api } from '@/convex/_generated/api';
+import { authClient } from '@/lib/auth-client';
 import { Button } from './ui/button';
 
 export function UserAvatar() {
+  const router = useRouter();
   const userData = useQuery(api.auth.getCurrentUser);
 
   if (!userData) {
@@ -77,7 +80,17 @@ export function UserAvatar() {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem
+          onSelect={async (event) => {
+            event.preventDefault();
+            try {
+              await authClient.signOut();
+            } finally {
+              router.replace('/sign-in');
+              router.refresh();
+            }
+          }}
+        >
           <LogOut />
           Log out
         </DropdownMenuItem>
