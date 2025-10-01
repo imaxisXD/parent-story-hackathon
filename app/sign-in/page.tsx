@@ -16,7 +16,10 @@ import { authClient } from '@/lib/auth-client';
 export default function SignIn() {
   const handleGithubSignIn = async () => {
     await authClient.signIn.social(
-      { provider: 'github' },
+      {
+        provider: 'github',
+        callbackURL: `${process.env.SITE_URL}/parent`,
+      },
       {
         onError: (ctx) => {
           console.log(ctx);
